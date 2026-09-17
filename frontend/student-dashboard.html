@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Student Dashboard</title>
+
+    <link rel="stylesheet"
+          href="css/style.css">
+
+</head>
+
+<body>
+
+    <!-- ================================
+         NAVIGATION BAR
+    ================================= -->
+
+    <nav class="navbar">
+
+        <div class="nav-container">
+
+            <div class="logo">
+                🎓 Student Profiling System
+            </div>
+
+            <div class="nav-links">
+
+                <a href="student-dashboard.html"
+                   class="active">
+                    Dashboard
+                </a>
+
+                <a href="Student-profile.html">
+                    My Profile
+                </a>
+
+                <a href="index.html"
+                   id="logoutLink">
+                    Logout
+                </a>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+    <!-- ================================
+         MAIN CONTENT
+    ================================= -->
+
+    <main class="student-dashboard">
+
+
+        <!-- PAGE HEADER -->
+
+        <div class="dashboard-header">
+
+            <p class="dashboard-label">
+                STUDENT PORTAL
+            </p>
+
+            <h1>
+                Student Dashboard
+            </h1>
+
+            <p class="dashboard-subtitle">
+                View your academic performance,
+                profile information and career goals.
+            </p>
+
+        </div>
+
+
+
+        <!-- ================================
+             WELCOME CARD
+        ================================= -->
+
+        <section class="student-welcome">
+
+            <div class="welcome-content">
+
+                <div class="welcome-icon">
+                    🎓
+                </div>
+
+                <div>
+
+                    <p class="welcome-small">
+                        Welcome back
+                    </p>
+
+                    <h2 id="studentWelcome">
+                        Welcome, Student
+                    </h2>
+
+                    <p>
+                        Keep your profile updated to help
+                        your mentor understand your progress.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <a href="Student-profile.html"
+               class="profile-button">
+
+                Update Profile
+
+            </a>
+
+        </section>
+
+
+
+        <!-- ================================
+             ACADEMIC OVERVIEW
+        ================================= -->
+
+        <section class="dashboard-section">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <h2>
+                        Academic Overview
+                    </h2>
+
+                    <p>
+                        Your current academic indicators
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="student-indicators">
+
+
+                <!-- CGPA -->
+
+                <div class="student-stat-card">
+
+                    <div class="stat-top">
+
+                        <span class="stat-title">
+                            Current CGPA
+                        </span>
+
+                        <span class="stat-icon">
+                            📊
+                        </span>
+
+                    </div>
+
+                    <h3 id="studentCgpa">
+                        -
+                    </h3>
+
+                    <p>
+                        Overall academic performance
+                    </p>
+
+                </div>
+
+
+
+                <!-- ARREARS -->
+
+                <div class="student-stat-card">
+
+                    <div class="stat-top">
+
+                        <span class="stat-title">
+                            Total Arrears
+                        </span>
+
+                        <span class="stat-icon">
+                            📚
+                        </span>
+
+                    </div>
+
+                    <h3 id="studentArrears">
+                        0
+                    </h3>
+
+                    <p>
+                        Current active arrears
+                    </p>
+
+                </div>
+
+
+
+                <!-- CAREER GOAL -->
+
+                <div class="student-stat-card">
+
+                    <div class="stat-top">
+
+                        <span class="stat-title">
+                            Career Goal
+                        </span>
+
+                        <span class="stat-icon">
+                            🎯
+                        </span>
+
+                    </div>
+
+                    <h3 id="studentCareerGoal">
+                        -
+                    </h3>
+
+                    <p>
+                        Your selected career path
+                    </p>
+
+                </div>
+
+
+
+                <!-- PROFILE COMPLETION -->
+
+                <div class="student-stat-card">
+
+                    <div class="stat-top">
+
+                        <span class="stat-title">
+                            Profile Completion
+                        </span>
+
+                        <span class="stat-icon">
+                            ✓
+                        </span>
+
+                    </div>
+
+                    <h3 id="profileCompletion">
+                        0%
+                    </h3>
+
+                    <div class="dashboard-progress">
+
+                        <div id="profileProgress"
+                             class="dashboard-progress-fill">
+                        </div>
+
+                    </div>
+
+                    <p>
+                        Profile completion status
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ================================
+             PERSONAL INFORMATION
+        ================================= -->
+
+        <section class="dashboard-section">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <h2>
+                        Personal Information
+                    </h2>
+
+                    <p>
+                        Basic information from your profile
+                    </p>
+
+                </div>
+
+                <a href="Student-profile.html"
+                   class="section-link">
+
+                    Edit Profile →
+
+                </a>
+
+            </div>
+
+
+            <div class="student-information">
+
+
+                <div class="information-item">
+
+                    <span>
+                        Register Number
+                    </span>
+
+                    <strong id="studentRegisterNumber">
+                        -
+                    </strong>
+
+                </div>
+
+
+
+                <div class="information-item">
+
+                    <span>
+                        Student Name
+                    </span>
+
+                    <strong id="studentName">
+                        -
+                    </strong>
+
+                </div>
+
+
+
+                <div class="information-item">
+
+                    <span>
+                        Department
+                    </span>
+
+                    <strong id="studentDepartment">
+                        -
+                    </strong>
+
+                </div>
+
+
+
+                <div class="information-item">
+
+                    <span>
+                        Section
+                    </span>
+
+                    <strong id="studentSection">
+                        -
+                    </strong>
+
+                </div>
+
+
+
+                <div class="information-item">
+
+                    <span>
+                        Student Category
+                    </span>
+
+                    <strong id="studentCategory">
+                        -
+                    </strong>
+
+                </div>
+
+
+
+                <div class="information-item">
+
+                    <span>
+                        Student Type
+                    </span>
+
+                    <strong id="studentType">
+                        -
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ================================
+             BOTTOM SECTION
+        ================================= -->
+
+        <div class="dashboard-bottom">
+
+
+            <!-- CAREER PLANNING -->
+
+            <section class="dashboard-section">
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <h2>
+                            Career Planning
+                        </h2>
+
+                        <p>
+                            Your current career direction
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="career-display">
+
+                    <div class="career-circle">
+                        🎯
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Selected Career Goal
+                        </span>
+
+                        <h3 id="careerGoalDisplay">
+                            -
+                        </h3>
+
+                        <p>
+                            Manage your career information
+                            from your profile.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <a href="Student-profile.html"
+                   class="outline-button">
+
+                    Manage Career Information
+
+                </a>
+
+            </section>
+
+
+
+            <!-- QUICK ACTIONS -->
+
+            <section class="dashboard-section">
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <h2>
+                            Quick Actions
+                        </h2>
+
+                        <p>
+                            Access your student services
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="quick-action-list">
+
+
+                    <a href="Student-profile.html"
+                       class="quick-action">
+
+                        <span class="quick-action-icon">
+                            👤
+                        </span>
+
+                        <span>
+
+                            <strong>
+                                My Profile
+                            </strong>
+
+                            <small>
+                                View or update profile
+                            </small>
+
+                        </span>
+
+                        <span class="arrow">
+                            →
+                        </span>
+
+                    </a>
+
+
+
+                    <a href="Student-profile.html"
+                       class="quick-action">
+
+                        <span class="quick-action-icon">
+                            📋
+                        </span>
+
+                        <span>
+
+                            <strong>
+                                Academic Details
+                            </strong>
+
+                            <small>
+                                Update semester records
+                            </small>
+
+                        </span>
+
+                        <span class="arrow">
+                            →
+                        </span>
+
+                    </a>
+
+
+
+                    <a href="Student-profile.html"
+                       class="quick-action">
+
+                        <span class="quick-action-icon">
+                            🎯
+                        </span>
+
+                        <span>
+
+                            <strong>
+                                Career Goal
+                            </strong>
+
+                            <small>
+                                Manage career preferences
+                            </small>
+
+                        </span>
+
+                        <span class="arrow">
+                            →
+                        </span>
+
+                    </a>
+
+                </div>
+
+            </section>
+
+        </div>
+
+
+    </main>
+
+
+
+    <!-- ================================
+         FOOTER
+    ================================= -->
+
+    <footer class="footer">
+
+        <p>
+            Student Profiling System
+        </p>
+
+        <span>
+            Student Portal
+        </span>
+
+    </footer>
+
+
+
+    <!-- JAVASCRIPT -->
+
+    <script src="js/app.js"></script>
+
+</body>
+
+</html>

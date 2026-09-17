@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Faculty Dashboard</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+
+    <div class="container">
+
+        <a class="navbar-brand" href="faculty-dashboard.html">
+            🎓 Faculty Portal
+        </a>
+
+        <div class="navbar-nav ms-auto">
+
+            <a
+                class="nav-link active"
+                href="faculty-dashboard.html">
+                Dashboard
+            </a>
+
+            <a
+                class="nav-link"
+                href="students.html">
+                Students
+            </a>
+
+            <a
+                class="nav-link"
+                href="add-student.html">
+                Add Student
+            </a>
+
+            <a
+                class="nav-link logout-link"
+                href="#">
+                Logout
+            </a>
+
+        </div>
+
+    </div>
+
+</nav>
+
+
+<div class="container page-container">
+
+    <div class="page-title">
+
+        <h2>Faculty Dashboard</h2>
+
+        <p>
+            Monitor student academic, personal and career information.
+        </p>
+
+    </div>
+
+
+    <!-- BASIC COUNTS -->
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-3">
+
+            <div class="stat-card">
+
+                <div class="stat-icon">👨‍🎓</div>
+
+                <h3 id="totalStudents">0</h3>
+
+                <p>Total Students</p>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-3">
+
+            <div class="stat-card">
+
+                <div class="stat-icon">🏠</div>
+
+                <h3 id="hostellerCount">0</h3>
+
+                <p>Hostellers</p>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-3">
+
+            <div class="stat-card">
+
+                <div class="stat-icon">🚌</div>
+
+                <h3 id="dayScholarCount">0</h3>
+
+                <p>Day Scholars</p>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-3">
+
+            <div class="stat-card">
+
+                <div class="stat-icon">📊</div>
+
+                <h3 id="averageCgpa">0</h3>
+
+                <p>Average CGPA</p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ACADEMIC -->
+
+    <div class="section-heading">
+        <h4>Academic Insights</h4>
+    </div>
+
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-4">
+
+            <div class="insight-card">
+
+                <h5>Highest CGPA</h5>
+
+                <h3 id="highestCgpa">0</h3>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="insight-card">
+
+                <h5>Lowest CGPA</h5>
+
+                <h3 id="lowestCgpa">0</h3>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="insight-card">
+
+                <h5>Students with Active Arrears</h5>
+
+                <h3 id="activeArrears">0</h3>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-4">
+
+            <div class="insight-card">
+
+                <h5>Total Arrears</h5>
+
+                <h3 id="totalArrears">0</h3>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="insight-card">
+
+                <h5>Pending Arrears</h5>
+
+                <h3 id="pendingArrears">0</h3>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="insight-card">
+
+                <h5>Cleared Arrears</h5>
+
+                <h3 id="clearedArrears">0</h3>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- CAREER -->
+
+    <div class="section-heading">
+        <h4>Career Goal Distribution</h4>
+    </div>
+
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-4">
+
+            <div class="career-card">
+
+                <h5>Placement</h5>
+
+                <h2 id="placementCount">0</h2>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="career-card">
+
+                <h5>Higher Studies</h5>
+
+                <h2 id="higherStudiesCount">0</h2>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="career-card">
+
+                <h5>Entrepreneurship</h5>
+
+                <h2 id="entrepreneurshipCount">0</h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- MENTORING -->
+
+    <div class="section-heading">
+        <h4>Mentoring Indicators</h4>
+    </div>
+
+
+    <div class="row g-4">
+
+        <div class="col-md-4">
+
+            <div class="insight-card">
+
+                <h5>Remedial Support</h5>
+
+                <h3 id="remedialStudents">0</h3>
+
+                <p>Students requiring support</p>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="insight-card">
+
+                <h5>Mentor Intervention</h5>
+
+                <h3 id="mentorIntervention">0</h3>
+
+                <p>Students requiring intervention</p>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="insight-card">
+
+                <h5>Without Projects</h5>
+
+                <h3 id="withoutProjects">0</h3>
+
+                <p>Students without projects</p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="text-center mt-5">
+
+        <a
+            href="students.html"
+            class="btn btn-primary btn-lg">
+            View All Students
+        </a>
+
+    </div>
+
+</div>
+
+
+<footer class="footer">
+
+    <p>
+        Faculty Portal - Student Profiling System
+    </p>
+
+</footer>
+
+
+<script src="js/app.js"></script>
+
+</body>
+</html>
