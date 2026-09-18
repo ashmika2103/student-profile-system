@@ -1,488 +1,1097 @@
-/* =========================================================
-   STUDENT PROFILING SYSTEM
-   COMPLETE APP.JS
-========================================================= */
+const API_URL = "http://localhost:5000/api";
 
 
-/* =========================================================
-   GLOBAL SETTINGS
-========================================================= */
+/* =====================================================
+   COMMON FUNCTIONS
+===================================================== */
 
-const STUDENT_LOGIN_ID = "24BCS034";
-const STUDENT_PASSWORD = "student123";
-
-const FACULTY_LOGIN_ID = "FAC001";
-const FACULTY_PASSWORD = "faculty123";
-
-
-/* =========================================================
-   DOM READY
-========================================================= */
-
-document.addEventListener("DOMContentLoaded", function () {
-
-    initializeLogin();
-
-    checkPageAccess();
-
-    initializeStudentProfile();
-
-    initializeStudentDashboard();
-
-    initializeStudentsPage();
-
-    initializeFacultyDashboard();
-
-    initializeStudentView();
-
-    initializeAddStudent();
-
-    initializeNavigation();
-
-});
+function getLoggedUser() {
+    try {
+        return JSON.parse(
+            localStorage.getItem("loggedUser")
+        );
+    } catch {
+        return null;
+    }
+}
 
 
+function logout() {
 
-/* =========================================================
+    localStorage.removeItem("loggedUser");
+    localStorage.removeItem("currentStudent");
+
+    window.location.href = "index.html";
+}
+
+
+function showMessage(elementId, message, type = "success") {
+
+    const element =
+        document.getElementById(elementId);
+
+    if (!element) return;
+
+    element.innerHTML = `
+        <div class="${type === "success"
+            ? "success-message"
+            : "validation-message"}">
+            ${message}
+        </div>
+    `;
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
+
+
+/* =====================================================
+   PAGE ACCESS CONTROL
+===================================================== */
+
+function checkStudentPage() {
+
+    const user = getLoggedUser();
+
+    if (!user) {
+        window.location.href = "index.html";
+        return false;
+    }
+
+    if (user.role !== "Student") {
+        alert("Student access only.");
+
+        window.location.href =
+            "faculty-dashboard.html";
+
+        return false;
+    }
+
+    return true;
+}
+
+
+function checkFacultyPage() {
+
+    const user = getLoggedUser();
+
+    if (!user) {
+        window.location.href = "index.html";
+        return false;
+    }
+
+    if (user.role !== "Faculty") {
+        alert("Faculty access only.");
+
+        window.location.href =
+            "student-dashboard.html";
+
+        return false;
+    }
+
+    return true;
+}
+
+
+/* =====================================================
    LOGIN
-========================================================= */
+===================================================== */
 
 function initializeLogin() {
 
-    const loginForm =
+    const form =
         document.getElementById("loginForm");
 
-    if (!loginForm) {
-        return;
-    }
+    if (!form) return;
 
-    loginForm.setAttribute(
-        "novalidate",
-        "novalidate"
-    );
+    const role =
+        document.getElementById("role");
 
-    loginForm.addEventListener(
-        "submit",
-        function (event) {
+    const loginId =
+        document.getElementById("loginId");
 
-            event.preventDefault();
-
-            clearLoginErrors();
-
-            const role =
-                document.getElementById("role");
-
-            const loginId =
-                document.getElementById("loginId");
-
-            const password =
-                document.getElementById("password");
-
-            let valid = true;
+    const password =
+        document.getElementById("password");
 
 
-            /* ROLE VALIDATION */
+    form.addEventListener("submit", async function (event) {
 
-            if (!role || role.value === "") {
+        event.preventDefault();
 
-                showLoginError(
-                    role,
-                    "Please select your role."
+        const selectedRole =
+            role.value.trim();
+
+        const enteredLoginId =
+            loginId.value.trim();
+
+        const enteredPassword =
+            password.value.trim();
+
+
+        if (
+            !selectedRole ||
+            !enteredLoginId ||
+            !enteredPassword
+        ) {
+
+            showMessage(
+                "loginError",
+                "Please enter all login details.",
+                "error"
+            );
+
+            return;
+        }
+
+
+        try {
+
+            const response =
+                await fetch(
+                    `${API_URL}/auth/login`,
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            loginId:
+                                enteredLoginId,
+
+                            password:
+                                enteredPassword,
+
+                            role:
+                                selectedRole
+                        })
+                    }
                 );
 
-                valid = false;
-            }
+
+            const data =
+                await response.json();
 
 
-            /* ID VALIDATION */
+            if (!response.ok) {
 
-            if (
-                !loginId ||
-                loginId.value.trim() === ""
-            ) {
-
-                showLoginError(
-                    loginId,
-                    "Please enter your ID."
+                showMessage(
+                    "loginError",
+                    data.message ||
+                    "Invalid login credentials.",
+                    "error"
                 );
 
-                valid = false;
-            }
-
-
-            /* PASSWORD VALIDATION */
-
-            if (
-                !password ||
-                password.value.trim() === ""
-            ) {
-
-                showLoginError(
-                    password,
-                    "Please enter your password."
-                );
-
-                valid = false;
-            }
-
-
-            if (!valid) {
                 return;
             }
 
 
-            const enteredRole =
-                role.value;
-
-            const enteredId =
-                loginId.value.trim();
-
-            const enteredPassword =
-                password.value;
+            localStorage.setItem(
+                "loggedUser",
+                JSON.stringify(data.user)
+            );
 
 
-            /* STUDENT LOGIN */
-
-            if (
-                enteredRole === "student" &&
-                enteredId.toUpperCase() ===
-                STUDENT_LOGIN_ID &&
-                enteredPassword ===
-                STUDENT_PASSWORD
-            ) {
-
-                localStorage.setItem(
-                    "userRole",
-                    "student"
-                );
-
-                localStorage.setItem(
-                    "loggedInUser",
-                    enteredId
-                );
+            if (data.user.role === "Student") {
 
                 window.location.href =
                     "student-dashboard.html";
 
-                return;
-            }
-
-
-            /* FACULTY LOGIN */
-
-            if (
-                enteredRole === "faculty" &&
-                enteredId.toUpperCase() ===
-                FACULTY_LOGIN_ID &&
-                enteredPassword ===
-                FACULTY_PASSWORD
-            ) {
-
-                localStorage.setItem(
-                    "userRole",
-                    "faculty"
-                );
-
-                localStorage.setItem(
-                    "loggedInUser",
-                    enteredId
-                );
+            } else {
 
                 window.location.href =
                     "faculty-dashboard.html";
 
-                return;
             }
 
 
-            /* INVALID LOGIN */
+        } catch (error) {
 
-            const error =
-                document.getElementById(
-                    "loginError"
-                );
+            console.error(error);
 
-            if (error) {
-
-                error.textContent =
-                    "Invalid role, ID or password.";
-
-                error.style.display =
-                    "block";
-            }
-
+            showMessage(
+                "loginError",
+                "Cannot connect to backend. Make sure the server is running.",
+                "error"
+            );
         }
-    );
-
-
-    /* LIVE LOGIN VALIDATION */
-
-    const fields =
-        loginForm.querySelectorAll(
-            "input, select"
-        );
-
-
-    fields.forEach(function (field) {
-
-        field.addEventListener(
-            "input",
-            function () {
-
-                if (
-                    field.value.trim() !== ""
-                ) {
-
-                    removeLoginError(
-                        field
-                    );
-                }
-
-            }
-        );
-
-
-        field.addEventListener(
-            "change",
-            function () {
-
-                if (
-                    field.value.trim() !== ""
-                ) {
-
-                    removeLoginError(
-                        field
-                    );
-                }
-
-            }
-        );
 
     });
-
 }
 
 
+/* =====================================================
+   STUDENT TYPE
+===================================================== */
 
-/* =========================================================
-   LOGIN ERROR FUNCTIONS
-========================================================= */
+function initializeStudentType() {
 
-function showLoginError(
-    field,
-    message
-) {
+    const studentType =
+        document.getElementById("studentType");
 
-    if (!field) {
-        return;
+    if (!studentType) return;
+
+
+    function updateFields() {
+
+        const hostelFields =
+            document.getElementById("hostelFields");
+
+        const hostelRoomField =
+            document.getElementById("hostelRoomField");
+
+        const dayScholarFields =
+            document.getElementById("dayScholarFields");
+
+
+        hostelFields.style.display =
+            "none";
+
+        hostelRoomField.style.display =
+            "none";
+
+        dayScholarFields.style.display =
+            "none";
+
+
+        if (studentType.value === "Hosteller") {
+
+            hostelFields.style.display =
+                "flex";
+
+            hostelRoomField.style.display =
+                "flex";
+
+        }
+
+
+        if (
+            studentType.value ===
+            "Day Scholar"
+        ) {
+
+            dayScholarFields.style.display =
+                "flex";
+        }
     }
 
 
-    field.classList.add(
-        "input-error"
+    studentType.addEventListener(
+        "change",
+        updateFields
     );
 
-
-    let error =
-        field.parentElement.querySelector(
-            ".error-message"
-        );
+    updateFields();
+}
 
 
-    if (!error) {
+/* =====================================================
+   CAREER GOAL
+===================================================== */
 
-        error =
-            document.createElement(
-                "small"
+function initializeCareerGoal() {
+
+    const careerGoal =
+        document.getElementById("careerGoal");
+
+    if (!careerGoal) return;
+
+
+    function updateCareerFields() {
+
+        const placement =
+            document.getElementById(
+                "placementFields"
             );
 
-        error.className =
-            "error-message";
+        const higher =
+            document.getElementById(
+                "higherStudiesFields"
+            );
 
-        field.parentElement.appendChild(
-            error
-        );
+        const entrepreneurship =
+            document.getElementById(
+                "entrepreneurshipFields"
+            );
+
+
+        placement.style.display = "none";
+        higher.style.display = "none";
+        entrepreneurship.style.display = "none";
+
+
+        if (
+            careerGoal.value ===
+            "Placement"
+        ) {
+
+            placement.style.display =
+                "block";
+        }
+
+
+        if (
+            careerGoal.value ===
+            "Higher Studies"
+        ) {
+
+            higher.style.display =
+                "block";
+        }
+
+
+        if (
+            careerGoal.value ===
+            "Entrepreneurship"
+        ) {
+
+            entrepreneurship.style.display =
+                "block";
+        }
     }
 
 
-    error.textContent =
-        message;
-
-    error.style.display =
-        "block";
-}
-
-
-function removeLoginError(field) {
-
-    if (!field) {
-        return;
-    }
-
-    field.classList.remove(
-        "input-error"
+    careerGoal.addEventListener(
+        "change",
+        updateCareerFields
     );
 
-
-    const error =
-        field.parentElement.querySelector(
-            ".error-message"
-        );
-
-
-    if (error) {
-        error.remove();
-    }
-
+    updateCareerFields();
 }
 
 
-function clearLoginErrors() {
+/* =====================================================
+   SEMESTER
+===================================================== */
+
+let semesterCount = 0;
+
+
+function addSemester() {
+
+    semesterCount++;
+
+    const container =
+        document.getElementById(
+            "semesterContainer"
+        );
+
+    if (!container) return;
+
+
+    const div =
+        document.createElement("div");
+
+    div.className = "card";
+
+    div.style.marginTop = "15px";
+
+
+    div.innerHTML = `
+
+        <h3>
+            Semester ${semesterCount}
+        </h3>
+
+        <div class="form-grid">
+
+            <div class="form-group">
+
+                <label>Semester</label>
+
+                <input
+                    type="number"
+                    class="semester-number"
+                    value="${semesterCount}"
+                    min="1"
+                    max="8">
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Percentage</label>
+
+                <input
+                    type="number"
+                    class="semester-percentage"
+                    min="0"
+                    max="100"
+                    step="0.01">
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Total Arrears</label>
+
+                <input
+                    type="number"
+                    class="semester-total-arrears"
+                    min="0"
+                    value="0">
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Cleared Arrears</label>
+
+                <input
+                    type="number"
+                    class="semester-cleared-arrears"
+                    min="0"
+                    value="0">
+
+            </div>
+
+        </div>
+
+        <div class="button-container">
+
+            <button
+                type="button"
+                class="btn btn-danger"
+                onclick="this.closest('.card').remove()">
+
+                Remove Semester
+
+            </button>
+
+        </div>
+    `;
+
+
+    container.appendChild(div);
+}
+
+
+/* =====================================================
+   ARREARS
+===================================================== */
+
+let arrearCount = 0;
+
+
+function initializeArrears() {
+
+    const hasArrears =
+        document.getElementById(
+            "hasArrears"
+        );
+
+    if (!hasArrears) return;
+
+
+    hasArrears.addEventListener(
+        "change",
+        function () {
+
+            const section =
+                document.getElementById(
+                    "arrearSection"
+                );
+
+            if (
+                hasArrears.value ===
+                "true"
+            ) {
+
+                section.style.display =
+                    "block";
+
+            } else {
+
+                section.style.display =
+                    "none";
+            }
+        }
+    );
+}
+
+
+function addArrear() {
+
+    arrearCount++;
+
+    const container =
+        document.getElementById(
+            "arrearContainer"
+        );
+
+    if (!container) return;
+
+
+    const div =
+        document.createElement("div");
+
+    div.className = "card";
+
+    div.style.marginTop = "15px";
+
+
+    div.innerHTML = `
+
+        <h3>
+            Arrear ${arrearCount}
+        </h3>
+
+        <div class="form-grid">
+
+            <div class="form-group">
+
+                <label>Subject Code</label>
+
+                <input
+                    type="text"
+                    class="arrear-code">
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Subject Name</label>
+
+                <input
+                    type="text"
+                    class="arrear-name">
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Semester</label>
+
+                <input
+                    type="number"
+                    class="arrear-semester"
+                    min="1"
+                    max="8">
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Status</label>
+
+                <select class="arrear-status">
+
+                    <option value="Active">
+                        Active
+                    </option>
+
+                    <option value="Cleared">
+                        Cleared
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+        <div class="button-container">
+
+            <button
+                type="button"
+                class="btn btn-danger"
+                onclick="this.closest('.card').remove()">
+
+                Remove
+
+            </button>
+
+        </div>
+    `;
+
+
+    container.appendChild(div);
+}
+
+
+/* =====================================================
+   VALIDATION
+===================================================== */
+
+function validateStudentForm() {
 
     const form =
         document.getElementById(
-            "loginForm"
+            "studentForm"
         );
 
-    if (!form) {
-        return;
-    }
+    if (!form) return false;
 
 
-    form.querySelectorAll(
-        ".input-error"
-    ).forEach(function (field) {
-
-        field.classList.remove(
-            "input-error"
-        );
-
-    });
+    let valid = true;
 
 
     form.querySelectorAll(
         ".error-message"
-    ).forEach(function (error) {
+    ).forEach(
+        element => element.remove()
+    );
 
-        error.remove();
+
+    form.querySelectorAll(
+        ".input-error"
+    ).forEach(
+        element =>
+            element.classList.remove(
+                "input-error"
+            )
+    );
+
+
+    const requiredFields =
+        form.querySelectorAll(
+            "[required]"
+        );
+
+
+    requiredFields.forEach(field => {
+
+        if (
+            field.offsetParent === null
+        ) {
+            return;
+        }
+
+
+        if (
+            !field.value.trim()
+        ) {
+
+            valid = false;
+
+            field.classList.add(
+                "input-error"
+            );
+
+
+            const error =
+                document.createElement(
+                    "span"
+                );
+
+            error.className =
+                "error-message";
+
+            error.textContent =
+                "This field is required.";
+
+
+            field.parentNode.appendChild(
+                error
+            );
+        }
 
     });
 
 
-    const error =
+    const mobile =
         document.getElementById(
-            "loginError"
-        );
-
-    if (error) {
-
-        error.textContent = "";
-
-        error.style.display =
-            "none";
-    }
-
-}
-
-
-
-/* =========================================================
-   PAGE ACCESS CONTROL
-========================================================= */
-
-function checkPageAccess() {
-
-    const page =
-        window.location.pathname
-            .split("/")
-            .pop()
-            .toLowerCase();
-
-
-    const role =
-        localStorage.getItem(
-            "userRole"
+            "mobile"
         );
 
 
-    /* LOGIN PAGE */
-
     if (
-        page === "" ||
-        page === "index.html"
+        mobile &&
+        mobile.value &&
+        !/^[6-9]\d{9}$/.test(
+            mobile.value.trim()
+        )
     ) {
 
-        return;
+        valid = false;
+
+        mobile.classList.add(
+            "input-error"
+        );
     }
 
 
-    /* IF NOT LOGGED IN */
-
-    if (!role) {
-
-        window.location.href =
-            "index.html";
-
-        return;
-    }
-
-
-    /* STUDENT ONLY PAGES */
-
-    const studentPages = [
-
-        "student-dashboard.html",
-
-        "student-profile.html",
-
-        "student-view.html"
-
-    ];
+    const collegeEmail =
+        document.getElementById(
+            "collegeEmail"
+        );
 
 
     if (
-        studentPages.includes(page) &&
-        role !== "student"
+        collegeEmail &&
+        collegeEmail.value &&
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+            collegeEmail.value.trim()
+        )
     ) {
 
-        window.location.href =
-            "index.html";
+        valid = false;
 
-        return;
+        collegeEmail.classList.add(
+            "input-error"
+        );
     }
 
 
-    /* FACULTY ONLY PAGES */
-
-    const facultyPages = [
-
-        "students.html",
-
-        "faculty-dashboard.html",
-
-        "add-student.html"
-
-    ];
-
-
-    if (
-        facultyPages.includes(page) &&
-        role !== "faculty"
-    ) {
-
-        window.location.href =
-            "index.html";
-
-        return;
-    }
-
+    return valid;
 }
 
 
+/* =====================================================
+   COLLECT STUDENT DATA
+===================================================== */
 
-/* =========================================================
-   STUDENT PROFILE
-========================================================= */
+function collectStudentData() {
+
+    const getValue =
+        id => {
+
+            const element =
+                document.getElementById(id);
+
+            return element
+                ? element.value.trim()
+                : "";
+        };
+
+
+    const semesterRecords = [];
+
+
+    document
+        .querySelectorAll(
+            "#semesterContainer .card"
+        )
+        .forEach(card => {
+
+            const semester =
+                card.querySelector(
+                    ".semester-number"
+                );
+
+            const percentage =
+                card.querySelector(
+                    ".semester-percentage"
+                );
+
+            const totalArrears =
+                card.querySelector(
+                    ".semester-total-arrears"
+                );
+
+            const clearedArrears =
+                card.querySelector(
+                    ".semester-cleared-arrears"
+                );
+
+
+            if (semester) {
+
+                semesterRecords.push({
+
+                    semester:
+                        Number(
+                            semester.value
+                        ),
+
+                    percentage:
+                        Number(
+                            percentage.value || 0
+                        ),
+
+                    totalArrears:
+                        Number(
+                            totalArrears.value || 0
+                        ),
+
+                    clearedArrears:
+                        Number(
+                            clearedArrears.value || 0
+                        )
+                });
+            }
+
+        });
+
+
+    const arrears = [];
+
+
+    document
+        .querySelectorAll(
+            "#arrearContainer .card"
+        )
+        .forEach(card => {
+
+            const code =
+                card.querySelector(
+                    ".arrear-code"
+                );
+
+            const name =
+                card.querySelector(
+                    ".arrear-name"
+                );
+
+            const semester =
+                card.querySelector(
+                    ".arrear-semester"
+                );
+
+            const status =
+                card.querySelector(
+                    ".arrear-status"
+                );
+
+
+            if (code) {
+
+                arrears.push({
+
+                    subjectCode:
+                        code.value.trim(),
+
+                    subjectName:
+                        name.value.trim(),
+
+                    semester:
+                        Number(
+                            semester.value || 0
+                        ),
+
+                    status:
+                        status.value,
+
+                    attempt: 1
+
+                });
+            }
+
+        });
+
+
+    const hasArrears =
+        getValue("hasArrears") === "true";
+
+
+    return {
+
+        registerNumber:
+            getValue("registerNumber"),
+
+        name:
+            getValue("name"),
+
+        dob:
+            getValue("dob"),
+
+        gender:
+            getValue("gender"),
+
+        department:
+            getValue("department"),
+
+        section:
+            getValue("section"),
+
+        collegeEmail:
+            getValue("collegeEmail"),
+
+        personalEmail:
+            getValue("personalEmail"),
+
+        mobile:
+            getValue("mobile"),
+
+        category:
+            getValue("category"),
+
+        address:
+            getValue("address"),
+
+        studentType:
+            getValue("studentType"),
+
+        hostelName:
+            getValue("hostelName"),
+
+        hostelRoom:
+            getValue("hostelRoom"),
+
+        distanceFromCollege:
+            Number(
+                getValue(
+                    "distanceFromCollege"
+                ) || 0
+            ),
+
+
+        familyDetails: {
+
+            fatherName:
+                getValue("fatherName"),
+
+            motherName:
+                getValue("motherName"),
+
+            fatherOccupation:
+                getValue("fatherOccupation"),
+
+            motherOccupation:
+                getValue("motherOccupation"),
+
+            familyIncome:
+                Number(
+                    getValue(
+                        "familyIncome"
+                    ) || 0
+                )
+        },
+
+
+        semesterRecords,
+
+
+        hasArrears,
+
+        arrears,
+
+
+        technicalProfile: {
+
+            programmingLanguages:
+                getValue(
+                    "programmingLanguages"
+                ),
+
+            technicalSkills:
+                getValue(
+                    "technicalSkills"
+                ),
+
+            projects:
+                getValue("projects"),
+
+            certifications:
+                getValue(
+                    "certifications"
+                )
+        },
+
+
+        selfEvaluation: {
+
+            strengths:
+                getValue("strengths"),
+
+            weaknesses:
+                getValue("weaknesses"),
+
+            interests:
+                getValue("interests"),
+
+            areasToImprove:
+                getValue(
+                    "areasToImprove"
+                )
+        },
+
+
+        careerGoal:
+            getValue("careerGoal"),
+
+
+        placementDetails: {
+
+            targetCompany:
+                getValue(
+                    "targetCompany"
+                ),
+
+            targetRole:
+                getValue(
+                    "targetRole"
+                ),
+
+            preparationStatus:
+                getValue(
+                    "preparationStatus"
+                )
+        },
+
+
+        higherStudiesDetails: {
+
+            degree:
+                getValue(
+                    "higherDegree"
+                ),
+
+            country:
+                getValue(
+                    "higherCountry"
+                ),
+
+            university:
+                getValue(
+                    "higherUniversity"
+                ),
+
+            entranceExam:
+                getValue(
+                    "entranceExam"
+                )
+        },
+
+
+        entrepreneurshipDetails: {
+
+            businessIdea:
+                getValue(
+                    "businessIdea"
+                ),
+
+            businessDomain:
+                getValue(
+                    "businessDomain"
+                ),
+
+            fundingRequired:
+                getValue(
+                    "fundingRequired"
+                ),
+
+            teamSize:
+                Number(
+                    getValue(
+                        "teamSize"
+                    ) || 0
+                )
+        }
+
+        /*
+         * NOTICE:
+         * There is NO cgpa here.
+         *
+         * CGPA belongs to Faculty.
+         */
+    };
+}
+
+
+/* =====================================================
+   STUDENT PROFILE SUBMIT
+===================================================== */
 
 function initializeStudentProfile() {
 
@@ -491,20 +1100,13 @@ function initializeStudentProfile() {
             "studentForm"
         );
 
+    if (!form) return;
 
-    if (!form) {
+
+    if (!checkStudentPage()) {
         return;
     }
 
-
-    /*
-       IMPORTANT:
-       Disable browser's default validation.
-
-       Our JavaScript will show:
-       RED BORDER
-       RED ERROR MESSAGE
-    */
 
     form.noValidate = true;
 
@@ -514,89 +1116,63 @@ function initializeStudentProfile() {
     );
 
 
-    /* HOSTELLER / DAY SCHOLAR */
-
-    setupResidenceFields();
-
-
-    /* CAREER GOAL */
-
-    setupCareerGoalFields();
+    const user =
+        getLoggedUser();
 
 
-    /* ADD SEMESTER */
-
-    const addSemesterBtn =
+    const registerInput =
         document.getElementById(
+            "registerNumber"
+        );
+
+
+    if (
+        user &&
+        user.registerNumber
+    ) {
+
+        registerInput.value =
+            user.registerNumber;
+
+        registerInput.readOnly =
+            true;
+    }
+
+
+    document
+        .getElementById(
             "addSemesterBtn"
-        );
-
-
-    if (addSemesterBtn) {
-
-        addSemesterBtn.addEventListener(
+        )
+        ?.addEventListener(
             "click",
-            function () {
-
-                addSemesterRow();
-
-            }
+            addSemester
         );
 
-    }
 
-
-    /* ADD ARREAR */
-
-    const addArrearBtn =
-        document.getElementById(
+    document
+        .getElementById(
             "addArrearBtn"
-        );
-
-
-    if (addArrearBtn) {
-
-        addArrearBtn.addEventListener(
+        )
+        ?.addEventListener(
             "click",
-            function () {
-
-                addArrearRow();
-
-            }
+            addArrear
         );
 
-    }
-
-
-    /* ARREAR STATUS */
-
-    setupArrearStatus();
-
-
-    /* FORM SUBMIT */
 
     form.addEventListener(
         "submit",
-        function (event) {
+        async function (event) {
 
             event.preventDefault();
 
 
-            clearAllValidationErrors();
+            if (!validateStudentForm()) {
 
-
-            const valid =
-                validateStudentForm();
-
-
-            if (!valid) {
-
-                showValidationMessage(
-                    "Please fill all required fields correctly."
+                showMessage(
+                    "formMessage",
+                    "Please fill all required fields correctly.",
+                    "error"
                 );
-
-
-                scrollToFirstError();
 
                 return;
             }
@@ -606,2407 +1182,666 @@ function initializeStudentProfile() {
                 collectStudentData();
 
 
-            localStorage.setItem(
-                "studentProfile",
-                JSON.stringify(
-                    studentData
-                )
-            );
+            try {
 
+                /*
+                 * Check if student already exists.
+                 */
 
-            saveStudentToList(
-                studentData
-            );
+                let existingStudent = null;
 
 
-            showSuccessMessage(
-                "Student profile saved successfully!"
-            );
+                const searchResponse =
+                    await fetch(
+                        `${API_URL}/students/register/${encodeURIComponent(
+                            studentData.registerNumber
+                        )}`
+                    );
 
-
-            setTimeout(
-                function () {
-
-                    window.location.href =
-                        "student-dashboard.html";
-
-                },
-                1000
-            );
-
-        }
-    );
-
-
-    /* RESET */
-
-    form.addEventListener(
-        "reset",
-        function () {
-
-            setTimeout(
-                function () {
-
-                    clearAllValidationErrors();
-
-                    setupResidenceFields();
-
-                    setupCareerGoalFields();
-
-                    setupArrearStatus();
-
-                },
-                50
-            );
-
-        }
-    );
-
-
-    /* LIVE VALIDATION */
-
-    const fields =
-        form.querySelectorAll(
-            "input, select, textarea"
-        );
-
-
-    fields.forEach(function (field) {
-
-
-        field.addEventListener(
-            "input",
-            function () {
-
-                validateSingleField(
-                    field,
-                    false
-                );
-
-            }
-        );
-
-
-        field.addEventListener(
-            "change",
-            function () {
-
-                validateSingleField(
-                    field,
-                    true
-                );
-
-            }
-        );
-
-
-        field.addEventListener(
-            "blur",
-            function () {
-
-                validateSingleField(
-                    field,
-                    true
-                );
-
-            }
-        );
-
-    });
-
-}
-
-
-
-/* =========================================================
-   RESIDENCE FIELDS
-========================================================= */
-
-function setupResidenceFields() {
-
-    const type =
-        document.getElementById(
-            "studentType"
-        );
-
-
-    if (!type) {
-        return;
-    }
-
-
-    function updateResidence() {
-
-        const value =
-            type.value;
-
-
-        const hostelSection =
-            document.getElementById(
-                "hostelSection"
-            );
-
-
-        const distanceSection =
-            document.getElementById(
-                "distanceSection"
-            );
-
-
-        if (hostelSection) {
-
-            if (
-                value.toLowerCase() ===
-                "hosteller"
-            ) {
-
-                hostelSection.style.display =
-                    "block";
-
-            }
-            else {
-
-                hostelSection.style.display =
-                    "none";
-
-            }
-
-        }
-
-
-        if (distanceSection) {
-
-            if (
-                value.toLowerCase() ===
-                "day scholar"
-            ) {
-
-                distanceSection.style.display =
-                    "block";
-
-            }
-            else {
-
-                distanceSection.style.display =
-                    "none";
-
-            }
-
-        }
-
-    }
-
-
-    type.addEventListener(
-        "change",
-        updateResidence
-    );
-
-
-    updateResidence();
-
-}
-
-
-
-/* =========================================================
-   CAREER GOAL FIELDS
-========================================================= */
-
-function setupCareerGoalFields() {
-
-    const careerGoal =
-        document.getElementById(
-            "careerGoal"
-        );
-
-
-    if (!careerGoal) {
-        return;
-    }
-
-
-    function updateCareerFields() {
-
-        const value =
-            careerGoal.value
-                .toLowerCase();
-
-
-        const placement =
-            document.getElementById(
-                "placementFields"
-            );
-
-
-        const higherStudies =
-            document.getElementById(
-                "higherStudiesFields"
-            );
-
-
-        const entrepreneurship =
-            document.getElementById(
-                "entrepreneurshipFields"
-            );
-
-
-        if (placement) {
-
-            placement.style.display =
-                value === "placement"
-                    ? "block"
-                    : "none";
-
-        }
-
-
-        if (higherStudies) {
-
-            higherStudies.style.display =
-                value ===
-                "higher studies"
-                    ? "block"
-                    : "none";
-
-        }
-
-
-        if (entrepreneurship) {
-
-            entrepreneurship.style.display =
-                value ===
-                "entrepreneurship"
-                    ? "block"
-                    : "none";
-
-        }
-
-    }
-
-
-    careerGoal.addEventListener(
-        "change",
-        updateCareerFields
-    );
-
-
-    updateCareerFields();
-
-}
-
-
-
-/* =========================================================
-   ARREAR STATUS
-========================================================= */
-
-function setupArrearStatus() {
-
-    const hasArrears =
-        document.getElementById(
-            "hasArrears"
-        );
-
-
-    if (!hasArrears) {
-        return;
-    }
-
-
-    function updateArrearSection() {
-
-        const section =
-            document.getElementById(
-                "arrearSection"
-            );
-
-
-        if (!section) {
-            return;
-        }
-
-
-        if (
-            hasArrears.value === "Yes"
-        ) {
-
-            section.style.display =
-                "block";
-
-        }
-        else {
-
-            section.style.display =
-                "none";
-
-        }
-
-    }
-
-
-    hasArrears.addEventListener(
-        "change",
-        updateArrearSection
-    );
-
-
-    updateArrearSection();
-
-}
-
-
-
-/* =========================================================
-   ADD SEMESTER ROW
-========================================================= */
-
-function addSemesterRow() {
-
-    const container =
-        document.getElementById(
-            "semesterContainer"
-        );
-
-
-    if (!container) {
-        return;
-    }
-
-
-    const count =
-        container.children.length + 1;
-
-
-    const row =
-        document.createElement(
-            "div"
-        );
-
-
-    row.className =
-        "dynamic-row semester-row";
-
-
-    row.innerHTML = `
-
-        <div class="form-group">
-
-            <label>
-                Semester *
-            </label>
-
-            <select
-                name="semester[]"
-                required
-            >
-
-                <option value="">
-                    Select Semester
-                </option>
-
-                <option value="1">
-                    Semester 1
-                </option>
-
-                <option value="2">
-                    Semester 2
-                </option>
-
-                <option value="3">
-                    Semester 3
-                </option>
-
-                <option value="4">
-                    Semester 4
-                </option>
-
-                <option value="5">
-                    Semester 5
-                </option>
-
-                <option value="6">
-                    Semester 6
-                </option>
-
-                <option value="7">
-                    Semester 7
-                </option>
-
-                <option value="8">
-                    Semester 8
-                </option>
-
-            </select>
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label>
-                SGPA *
-            </label>
-
-            <input
-                type="number"
-                name="sgpa[]"
-                class="cgpa-field"
-                min="0"
-                max="10"
-                step="0.01"
-                placeholder="Enter SGPA"
-                required
-            >
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label>
-                CGPA *
-            </label>
-
-            <input
-                type="number"
-                name="semesterCgpa[]"
-                class="cgpa-field"
-                min="0"
-                max="10"
-                step="0.01"
-                placeholder="Enter CGPA"
-                required
-            >
-
-        </div>
-
-
-        <button
-            type="button"
-            class="remove-button"
-            onclick="removeDynamicRow(this)"
-        >
-            Remove
-        </button>
-
-    `;
-
-
-    container.appendChild(
-        row
-    );
-
-
-    attachDynamicValidation(
-        row
-    );
-
-}
-
-
-
-/* =========================================================
-   ADD ARREAR ROW
-========================================================= */
-
-function addArrearRow() {
-
-    const container =
-        document.getElementById(
-            "arrearContainer"
-        );
-
-
-    if (!container) {
-        return;
-    }
-
-
-    const row =
-        document.createElement(
-            "div"
-        );
-
-
-    row.className =
-        "dynamic-row arrear-row";
-
-
-    row.innerHTML = `
-
-        <div class="form-group">
-
-            <label>
-                Subject Code *
-            </label>
-
-            <input
-                type="text"
-                name="arrearSubjectCode[]"
-                placeholder="Example: CS101"
-                required
-            >
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label>
-                Subject Name *
-            </label>
-
-            <input
-                type="text"
-                name="arrearSubjectName[]"
-                placeholder="Enter subject name"
-                required
-            >
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label>
-                Status *
-            </label>
-
-            <select
-                name="arrearStatus[]"
-                required
-            >
-
-                <option value="">
-                    Select Status
-                </option>
-
-                <option value="Active">
-                    Active
-                </option>
-
-                <option value="Cleared">
-                    Cleared
-                </option>
-
-            </select>
-
-        </div>
-
-
-        <button
-            type="button"
-            class="remove-button"
-            onclick="removeDynamicRow(this)"
-        >
-            Remove
-        </button>
-
-    `;
-
-
-    container.appendChild(
-        row
-    );
-
-
-    attachDynamicValidation(
-        row
-    );
-
-}
-
-
-
-/* =========================================================
-   REMOVE DYNAMIC ROW
-========================================================= */
-
-function removeDynamicRow(button) {
-
-    if (!button) {
-        return;
-    }
-
-
-    const row =
-        button.closest(
-            ".dynamic-row"
-        );
-
-
-    if (row) {
-
-        row.remove();
-
-    }
-
-}
-
-
-
-/* =========================================================
-   DYNAMIC VALIDATION
-========================================================= */
-
-function attachDynamicValidation(
-    container
-) {
-
-    const fields =
-        container.querySelectorAll(
-            "input, select, textarea"
-        );
-
-
-    fields.forEach(function (field) {
-
-        field.addEventListener(
-            "input",
-            function () {
-
-                validateSingleField(
-                    field,
-                    false
-                );
-
-            }
-        );
-
-
-        field.addEventListener(
-            "change",
-            function () {
-
-                validateSingleField(
-                    field,
-                    true
-                );
-
-            }
-        );
-
-
-        field.addEventListener(
-            "blur",
-            function () {
-
-                validateSingleField(
-                    field,
-                    true
-                );
-
-            }
-        );
-
-    });
-
-}
-
-
-
-/* =========================================================
-   VALIDATE COMPLETE STUDENT FORM
-========================================================= */
-
-function validateStudentForm() {
-
-    const form =
-        document.getElementById(
-            "studentForm"
-        );
-
-
-    if (!form) {
-        return true;
-    }
-
-
-    let isValid = true;
-
-
-    clearAllValidationErrors();
-
-
-    const fields =
-        form.querySelectorAll(
-            "input, select, textarea"
-        );
-
-
-    fields.forEach(function (field) {
-
-        if (
-            !isFieldVisible(field)
-        ) {
-            return;
-        }
-
-
-        const valid =
-            validateSingleField(
-                field,
-                true
-            );
-
-
-        if (!valid) {
-
-            isValid = false;
-
-        }
-
-    });
-
-
-    /* CAREER GOAL */
-
-    const careerGoal =
-        document.getElementById(
-            "careerGoal"
-        );
-
-
-    if (
-        careerGoal &&
-        isFieldVisible(careerGoal) &&
-        careerGoal.value.trim() === ""
-    ) {
-
-        showFieldError(
-            careerGoal,
-            "Please select your career goal."
-        );
-
-        isValid = false;
-    }
-
-
-    return isValid;
-
-}
-
-
-
-/* =========================================================
-   VALIDATE SINGLE FIELD
-========================================================= */
-
-function validateSingleField(
-    field,
-    showRequired
-) {
-
-    if (!field) {
-        return true;
-    }
-
-
-    if (
-        !isFieldVisible(field)
-    ) {
-
-        removeFieldError(
-            field
-        );
-
-        return true;
-    }
-
-
-    const value =
-        (field.value || "").trim();
-
-
-    const required =
-        field.hasAttribute(
-            "required"
-        );
-
-
-    /* EMPTY FIELD */
-
-    if (value === "") {
-
-        if (
-            required &&
-            showRequired
-        ) {
-
-            showFieldError(
-                field,
-                getRequiredMessage(field)
-            );
-
-            return false;
-        }
-
-
-        if (!required) {
-
-            removeFieldError(
-                field
-            );
-
-        }
-
-
-        return !required;
-    }
-
-
-
-    /* REGISTER NUMBER */
-
-    if (
-        field.id ===
-        "registerNumber"
-    ) {
-
-        const pattern =
-            /^[0-9]{2}[A-Za-z]{2,5}[0-9]{3,6}$/;
-
-
-        if (
-            !pattern.test(value)
-        ) {
-
-            showFieldError(
-                field,
-                "Enter a valid register number."
-            );
-
-            return false;
-        }
-
-    }
-
-
-
-    /* STUDENT NAME */
-
-    if (
-        field.id ===
-        "studentName"
-    ) {
-
-        if (
-            value.length < 2
-        ) {
-
-            showFieldError(
-                field,
-                "Student name must contain at least 2 characters."
-            );
-
-            return false;
-        }
-
-    }
-
-
-
-    /* EMAIL */
-
-    if (
-        field.type === "email" ||
-        field.id.toLowerCase().includes(
-            "email"
-        )
-    ) {
-
-        const emailPattern =
-            /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-
-        if (
-            !emailPattern.test(value)
-        ) {
-
-            showFieldError(
-                field,
-                "Enter a valid email address."
-            );
-
-            return false;
-        }
-
-    }
-
-
-
-    /* MOBILE */
-
-    if (
-        field.type === "tel" ||
-        field.id ===
-        "mobile" ||
-        field.id ===
-        "mobileNumber"
-    ) {
-
-        const mobile =
-            value.replace(
-                /\s/g,
-                ""
-            );
-
-
-        if (
-            !/^[6-9][0-9]{9}$/.test(
-                mobile
-            )
-        ) {
-
-            showFieldError(
-                field,
-                "Enter a valid 10-digit mobile number."
-            );
-
-            return false;
-        }
-
-    }
-
-
-
-    /* DATE OF BIRTH */
-
-    if (
-        field.id === "dob"
-    ) {
-
-        const selectedDate =
-            new Date(value);
-
-
-        const today =
-            new Date();
-
-
-        today.setHours(
-            0,
-            0,
-            0,
-            0
-        );
-
-
-        if (
-            selectedDate > today
-        ) {
-
-            showFieldError(
-                field,
-                "Date of birth cannot be in the future."
-            );
-
-            return false;
-        }
-
-    }
-
-
-
-    /* CGPA */
-
-    if (
-        field.classList.contains(
-            "cgpa-field"
-        ) ||
-        field.id === "cgpa" ||
-        field.name === "cgpa"
-    ) {
-
-        const cgpa =
-            parseFloat(value);
-
-
-        if (
-            isNaN(cgpa) ||
-            cgpa < 0 ||
-            cgpa > 10
-        ) {
-
-            showFieldError(
-                field,
-                "CGPA must be between 0 and 10."
-            );
-
-            return false;
-        }
-
-    }
-
-
-
-    /* PERCENTAGE */
-
-    if (
-        field.classList.contains(
-            "percentage-field"
-        ) ||
-        field.id ===
-        "percentage"
-    ) {
-
-        const percentage =
-            parseFloat(value);
-
-
-        if (
-            isNaN(percentage) ||
-            percentage < 0 ||
-            percentage > 100
-        ) {
-
-            showFieldError(
-                field,
-                "Percentage must be between 0 and 100."
-            );
-
-            return false;
-        }
-
-    }
-
-
-
-    /* NUMBER MIN / MAX */
-
-    if (
-        field.type === "number"
-    ) {
-
-        const number =
-            parseFloat(value);
-
-
-        if (
-            isNaN(number)
-        ) {
-
-            showFieldError(
-                field,
-                "Please enter a valid number."
-            );
-
-            return false;
-        }
-
-
-        if (
-            field.min !== "" &&
-            number <
-            parseFloat(field.min)
-        ) {
-
-            showFieldError(
-                field,
-                "Value must be at least " +
-                field.min +
-                "."
-            );
-
-            return false;
-        }
-
-
-        if (
-            field.max !== "" &&
-            number >
-            parseFloat(field.max)
-        ) {
-
-            showFieldError(
-                field,
-                "Value must not exceed " +
-                field.max +
-                "."
-            );
-
-            return false;
-        }
-
-    }
-
-
-
-    /* MIN LENGTH */
-
-    if (
-        field.minLength > 0 &&
-        value.length <
-        field.minLength
-    ) {
-
-        showFieldError(
-            field,
-            "Please enter at least " +
-            field.minLength +
-            " characters."
-        );
-
-        return false;
-    }
-
-
-
-    /* MAX LENGTH */
-
-    if (
-        field.maxLength > 0 &&
-        value.length >
-        field.maxLength
-    ) {
-
-        showFieldError(
-            field,
-            "Maximum " +
-            field.maxLength +
-            " characters allowed."
-        );
-
-        return false;
-    }
-
-
-
-    /* VALID */
-
-    removeFieldError(
-        field
-    );
-
-
-    return true;
-
-}
-
-
-
-/* =========================================================
-   REQUIRED MESSAGE
-========================================================= */
-
-function getRequiredMessage(field) {
-
-    const id =
-        field.id || "";
-
-
-    if (
-        id === "registerNumber"
-    ) {
-
-        return "Register number is required.";
-
-    }
-
-
-    if (
-        id === "studentName"
-    ) {
-
-        return "Student name is required.";
-
-    }
-
-
-    if (
-        id === "dob"
-    ) {
-
-        return "Date of birth is required.";
-
-    }
-
-
-    if (
-        id === "mobile" ||
-        id === "mobileNumber"
-    ) {
-
-        return "Mobile number is required.";
-
-    }
-
-
-    if (
-        id === "careerGoal"
-    ) {
-
-        return "Please select your career goal.";
-
-    }
-
-
-    if (
-        field.tagName ===
-        "SELECT"
-    ) {
-
-        return "Please select an option.";
-
-    }
-
-
-    return "This field is required.";
-
-}
-
-
-
-/* =========================================================
-   CHECK FIELD VISIBILITY
-========================================================= */
-
-function isFieldVisible(field) {
-
-    if (!field) {
-        return false;
-    }
-
-
-    if (
-        field.disabled
-    ) {
-        return false;
-    }
-
-
-    let element =
-        field;
-
-
-    while (
-        element &&
-        element !== document.body
-    ) {
-
-        const style =
-            window.getComputedStyle(
-                element
-            );
-
-
-        if (
-            style.display === "none" ||
-            style.visibility === "hidden"
-        ) {
-
-            return false;
-        }
-
-
-        element =
-            element.parentElement;
-    }
-
-
-    return true;
-
-}
-
-
-
-/* =========================================================
-   SHOW FIELD ERROR
-========================================================= */
-
-function showFieldError(
-    field,
-    message
-) {
-
-    if (!field) {
-        return;
-    }
-
-
-    field.classList.add(
-        "input-error"
-    );
-
-
-    field.setAttribute(
-        "aria-invalid",
-        "true"
-    );
-
-
-    const parent =
-        field.parentElement;
-
-
-    let error =
-        parent.querySelector(
-            ".error-message"
-        );
-
-
-    if (!error) {
-
-        error =
-            document.createElement(
-                "small"
-            );
-
-        error.className =
-            "error-message";
-
-        parent.appendChild(
-            error
-        );
-
-    }
-
-
-    error.textContent =
-        message;
-
-    error.style.display =
-        "block";
-
-}
-
-
-
-/* =========================================================
-   REMOVE FIELD ERROR
-========================================================= */
-
-function removeFieldError(
-    field
-) {
-
-    if (!field) {
-        return;
-    }
-
-
-    field.classList.remove(
-        "input-error"
-    );
-
-
-    field.removeAttribute(
-        "aria-invalid"
-    );
-
-
-    const error =
-        field.parentElement.querySelector(
-            ".error-message"
-        );
-
-
-    if (error) {
-
-        error.remove();
-
-    }
-
-}
-
-
-
-/* =========================================================
-   CLEAR ALL VALIDATION ERRORS
-========================================================= */
-
-function clearAllValidationErrors() {
-
-    const form =
-        document.getElementById(
-            "studentForm"
-        );
-
-
-    if (!form) {
-        return;
-    }
-
-
-    form.querySelectorAll(
-        ".input-error"
-    ).forEach(function (field) {
-
-        field.classList.remove(
-            "input-error"
-        );
-
-        field.removeAttribute(
-            "aria-invalid"
-        );
-
-    });
-
-
-    form.querySelectorAll(
-        ".error-message"
-    ).forEach(function (error) {
-
-        error.remove();
-
-    });
-
-
-    const messages =
-        form.querySelectorAll(
-            ".validation-message, .success-message"
-        );
-
-
-    messages.forEach(function (message) {
-
-        message.remove();
-
-    });
-
-}
-
-
-
-/* =========================================================
-   VALIDATION MESSAGE
-========================================================= */
-
-function showValidationMessage(
-    message
-) {
-
-    const form =
-        document.getElementById(
-            "studentForm"
-        );
-
-
-    if (!form) {
-        return;
-    }
-
-
-    const old =
-        form.querySelector(
-            ".validation-message"
-        );
-
-
-    if (old) {
-        old.remove();
-    }
-
-
-    const div =
-        document.createElement(
-            "div"
-        );
-
-
-    div.className =
-        "validation-message";
-
-
-    div.textContent =
-        message;
-
-
-    form.insertBefore(
-        div,
-        form.firstChild
-    );
-
-}
-
-
-
-/* =========================================================
-   SUCCESS MESSAGE
-========================================================= */
-
-function showSuccessMessage(
-    message
-) {
-
-    const form =
-        document.getElementById(
-            "studentForm"
-        );
-
-
-    if (!form) {
-        return;
-    }
-
-
-    const div =
-        document.createElement(
-            "div"
-        );
-
-
-    div.className =
-        "success-message";
-
-
-    div.textContent =
-        message;
-
-
-    form.insertBefore(
-        div,
-        form.firstChild
-    );
-
-}
-
-
-
-/* =========================================================
-   SCROLL TO FIRST ERROR
-========================================================= */
-
-function scrollToFirstError() {
-
-    const firstError =
-        document.querySelector(
-            "#studentForm .input-error"
-        );
-
-
-    if (!firstError) {
-        return;
-    }
-
-
-    firstError.scrollIntoView({
-        behavior: "smooth",
-        block: "center"
-    });
-
-
-    setTimeout(
-        function () {
-
-            firstError.focus();
-
-        },
-        400
-    );
-
-}
-
-
-
-/* =========================================================
-   COLLECT STUDENT DATA
-========================================================= */
-
-function collectStudentData() {
-
-    const form =
-        document.getElementById(
-            "studentForm"
-        );
-
-
-    const data = {};
-
-
-    if (!form) {
-        return data;
-    }
-
-
-    const formData =
-        new FormData(form);
-
-
-    formData.forEach(
-        function (value, key) {
-
-            if (
-                data[key] !== undefined
-            ) {
 
                 if (
-                    !Array.isArray(
-                        data[key]
-                    )
+                    searchResponse.ok
                 ) {
 
-                    data[key] = [
-                        data[key]
-                    ];
+                    const result =
+                        await searchResponse.json();
 
+                    existingStudent =
+                        result.student;
                 }
 
-                data[key].push(
-                    value
+
+                let response;
+
+
+                if (existingStudent) {
+
+                    /*
+                     * UPDATE
+                     */
+
+                    response =
+                        await fetch(
+                            `${API_URL}/students/${existingStudent._id}`,
+                            {
+                                method: "PUT",
+
+                                headers: {
+                                    "Content-Type":
+                                        "application/json"
+                                },
+
+                                body:
+                                    JSON.stringify(
+                                        studentData
+                                    )
+                            }
+                        );
+
+                } else {
+
+                    /*
+                     * CREATE
+                     */
+
+                    response =
+                        await fetch(
+                            `${API_URL}/students`,
+                            {
+                                method: "POST",
+
+                                headers: {
+                                    "Content-Type":
+                                        "application/json"
+                                },
+
+                                body:
+                                    JSON.stringify(
+                                        studentData
+                                    )
+                            }
+                        );
+                }
+
+
+                const data =
+                    await response.json();
+
+
+                if (!response.ok) {
+
+                    showMessage(
+                        "formMessage",
+                        data.message ||
+                        "Failed to save profile.",
+                        "error"
+                    );
+
+                    return;
+                }
+
+
+                localStorage.setItem(
+                    "currentStudent",
+                    JSON.stringify(
+                        data.student
+                    )
                 );
 
-            }
-            else {
 
-                data[key] = value;
+                showMessage(
+                    "formMessage",
+                    data.message ||
+                    "Profile saved successfully.",
+                    "success"
+                );
 
+
+            } catch (error) {
+
+                console.error(error);
+
+                showMessage(
+                    "formMessage",
+                    "Unable to connect to backend.",
+                    "error"
+                );
             }
 
         }
     );
 
 
-    /* DIRECT VALUES */
+    loadStudentProfile();
+}
 
-    const getValue =
-        function (id) {
+
+/* =====================================================
+   LOAD STUDENT PROFILE
+===================================================== */
+
+async function loadStudentProfile() {
+
+    const user =
+        getLoggedUser();
+
+    if (
+        !user ||
+        !user.registerNumber
+    ) {
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `${API_URL}/students/register/${encodeURIComponent(
+                    user.registerNumber
+                )}`
+            );
+
+
+        if (!response.ok) {
+            return;
+        }
+
+
+        const data =
+            await response.json();
+
+
+        const student =
+            data.student;
+
+
+        localStorage.setItem(
+            "currentStudent",
+            JSON.stringify(student)
+        );
+
+
+        fillStudentForm(student);
+
+
+    } catch (error) {
+
+        console.error(
+            "Load profile error:",
+            error
+        );
+    }
+}
+
+
+/* =====================================================
+   FILL STUDENT FORM
+===================================================== */
+
+function fillStudentForm(student) {
+
+    const setValue =
+        (id, value) => {
 
             const element =
-                document.getElementById(
-                    id
-                );
+                document.getElementById(id);
 
-            return element
-                ? element.value.trim()
-                : "";
+            if (element) {
 
+                element.value =
+                    value ?? "";
+            }
         };
 
 
-    data.registerNumber =
-        getValue(
-            "registerNumber"
-        );
-
-
-    data.studentName =
-        getValue(
-            "studentName"
-        );
-
-
-    data.dob =
-        getValue(
-            "dob"
-        );
-
-
-    data.gender =
-        getValue(
-            "gender"
-        );
-
-
-    data.department =
-        getValue(
-            "department"
-        );
-
-
-    data.section =
-        getValue(
-            "section"
-        );
-
-
-    data.institutionalEmail =
-        getValue(
-            "institutionalEmail"
-        );
-
-
-    data.personalEmail =
-        getValue(
-            "personalEmail"
-        );
-
-
-    data.mobile =
-        getValue(
-            "mobile"
-        ) ||
-        getValue(
-            "mobileNumber"
-        );
-
-
-    data.category =
-        getValue(
-            "category"
-        ) ||
-        getValue(
-            "studentCategory"
-        );
-
-
-    data.address =
-        getValue(
-            "address"
-        ) ||
-        getValue(
-            "residentialAddress"
-        );
-
-
-    data.studentType =
-        getValue(
-            "studentType"
-        );
-
-
-    data.careerGoal =
-        getValue(
-            "careerGoal"
-        );
-
-
-    /* CGPA */
-
-    const cgpaElement =
-        document.getElementById(
-            "cgpa"
-        );
-
-
-    if (cgpaElement) {
-
-        data.cgpa =
-            cgpaElement.value;
-
-    }
-
-
-    /* SEMESTERS */
-
-    data.semesters =
-        [];
-
-
-    const semesterContainer =
-        document.getElementById(
-            "semesterContainer"
-        );
-
-
-    if (semesterContainer) {
-
-        const rows =
-            semesterContainer.querySelectorAll(
-                ".semester-row"
-            );
-
-
-        rows.forEach(
-            function (row) {
-
-                const semester =
-                    row.querySelector(
-                        '[name="semester[]"]'
-                    );
-
-
-                const sgpa =
-                    row.querySelector(
-                        '[name="sgpa[]"]'
-                    );
-
-
-                const semesterCgpa =
-                    row.querySelector(
-                        '[name="semesterCgpa[]"]'
-                    );
-
-
-                data.semesters.push({
-
-                    semester:
-                        semester
-                            ? semester.value
-                            : "",
-
-                    sgpa:
-                        sgpa
-                            ? sgpa.value
-                            : "",
-
-                    cgpa:
-                        semesterCgpa
-                            ? semesterCgpa.value
-                            : ""
-
-                });
-
-            }
-        );
-
-    }
-
-
-    /* ARREARS */
-
-    data.arrears =
-        [];
-
-
-    const arrearContainer =
-        document.getElementById(
-            "arrearContainer"
-        );
-
-
-    if (arrearContainer) {
-
-        const rows =
-            arrearContainer.querySelectorAll(
-                ".arrear-row"
-            );
-
-
-        rows.forEach(
-            function (row) {
-
-                const code =
-                    row.querySelector(
-                        '[name="arrearSubjectCode[]"]'
-                    );
-
-
-                const name =
-                    row.querySelector(
-                        '[name="arrearSubjectName[]"]'
-                    );
-
-
-                const status =
-                    row.querySelector(
-                        '[name="arrearStatus[]"]'
-                    );
-
-
-                data.arrears.push({
-
-                    subjectCode:
-                        code
-                            ? code.value
-                            : "",
-
-                    subjectName:
-                        name
-                            ? name.value
-                            : "",
-
-                    status:
-                        status
-                            ? status.value
-                            : ""
-
-                });
-
-            }
-        );
-
-    }
-
-
-    data.updatedAt =
-        new Date().toISOString();
-
-
-    return data;
-
-}
-
-
-
-/* =========================================================
-   SAVE STUDENT TO LIST
-========================================================= */
-
-function saveStudentToList(
-    studentData
-) {
-
-    if (!studentData) {
-        return;
-    }
-
-
-    let students = [];
-
-
-    try {
-
-        students =
-            JSON.parse(
-                localStorage.getItem(
-                    "students"
-                )
-            ) || [];
-
-    }
-    catch (error) {
-
-        students = [];
-
-    }
-
-
-    const registerNumber =
-        studentData.registerNumber;
-
-
-    const existingIndex =
-        students.findIndex(
-            function (student) {
-
-                return (
-                    student.registerNumber ===
-                    registerNumber
-                );
-
-            }
-        );
-
-
-    if (
-        existingIndex !== -1
-    ) {
-
-        students[
-            existingIndex
-        ] = studentData;
-
-    }
-    else {
-
-        students.push(
-            studentData
-        );
-
-    }
-
-
-    localStorage.setItem(
-        "students",
-        JSON.stringify(
-            students
-        )
-    );
-
-}
-
-
-
-/* =========================================================
-   STUDENT DASHBOARD
-========================================================= */
-
-function initializeStudentDashboard() {
-
-    const welcome =
-        document.getElementById(
-            "studentWelcome"
-        );
-
-
-    if (!welcome) {
-        return;
-    }
-
-
-    const profile =
-        getStudentProfile();
-
-
-    if (!profile) {
-
-        setDashboardText(
-            "studentWelcome",
-            "Welcome, Student"
-        );
-
-        return;
-    }
-
-
-    const name =
-        profile.studentName ||
-        profile.name ||
-        "-";
-
-
-    const registerNumber =
-        profile.registerNumber ||
-        "-";
-
-
-    const department =
-        profile.department ||
-        "-";
-
-
-    const section =
-        profile.section ||
-        "-";
-
-
-    const category =
-        profile.category ||
-        profile.studentCategory ||
-        "-";
-
-
-    const studentType =
-        profile.studentType ||
-        "-";
-
-
-    const careerGoal =
-        profile.careerGoal ||
-        "-";
-
-
-    /* CGPA */
-
-    let cgpa =
-        profile.cgpa ||
-        "-";
-
-
-    if (
-        cgpa === "-" &&
-        Array.isArray(
-            profile.semesters
-        )
-    ) {
-
-        const values =
-            profile.semesters
-                .map(
-                    function (semester) {
-
-                        return parseFloat(
-                            semester.cgpa
-                        );
-
-                    }
-                )
-                .filter(
-                    function (value) {
-
-                        return !isNaN(
-                            value
-                        );
-
-                    }
-                );
-
-
-        if (values.length > 0) {
-
-            const total =
-                values.reduce(
-                    function (
-                        sum,
-                        value
-                    ) {
-
-                        return (
-                            sum + value
-                        );
-
-                    },
-                    0
-                );
-
-
-            cgpa =
-                (
-                    total /
-                    values.length
-                ).toFixed(2);
-
-        }
-
-    }
-
-
-    /* ARREARS */
-
-    let arrears = 0;
-
-
-    if (
-        Array.isArray(
-            profile.arrears
-        )
-    ) {
-
-        arrears =
-            profile.arrears.filter(
-                function (arrear) {
-
-                    return (
-                        !arrear.status ||
-                        arrear.status
-                            .toLowerCase() !==
-                            "cleared"
-                    );
-
-                }
-            ).length;
-
-    }
-
-
-
-    /* DISPLAY */
-
-    setDashboardText(
-        "studentWelcome",
-        "Welcome, " + name
-    );
-
-
-    setDashboardText(
-        "studentName",
-        name
-    );
-
-
-    setDashboardText(
-        "studentRegisterNumber",
-        registerNumber
-    );
-
-
-    setDashboardText(
-        "studentDepartment",
-        department
-    );
-
-
-    setDashboardText(
-        "studentSection",
-        section
-    );
-
-
-    setDashboardText(
-        "studentCategory",
-        category
-    );
-
-
-    setDashboardText(
-        "studentType",
-        studentType
-    );
-
-
-    setDashboardText(
-        "studentCgpa",
-        cgpa
-    );
-
-
-    setDashboardText(
-        "studentArrears",
-        arrears
-    );
-
-
-    setDashboardText(
-        "studentCareerGoal",
-        careerGoal
-    );
-
-
-    setDashboardText(
-        "careerGoalDisplay",
-        careerGoal
-    );
-
-
-    /* PROFILE COMPLETION */
-
-    const completion =
-        calculateProfileCompletion(
-            profile
-        );
-
-
-    setDashboardText(
-        "profileCompletion",
-        completion + "%"
-    );
-
-
-    const progress =
-        document.getElementById(
-            "profileProgress"
-        );
-
-
-    if (progress) {
-
-        progress.style.width =
-            completion + "%";
-
-    }
-
-}
-
-
-
-/* =========================================================
-   GET STUDENT PROFILE
-========================================================= */
-
-function getStudentProfile() {
-
-    try {
-
-        return JSON.parse(
-            localStorage.getItem(
-                "studentProfile"
-            )
-        );
-
-    }
-    catch (error) {
-
-        return null;
-
-    }
-
-}
-
-
-
-/* =========================================================
-   SET DASHBOARD TEXT
-========================================================= */
-
-function setDashboardText(
-    id,
-    value
-) {
-
-    const element =
-        document.getElementById(
-            id
-        );
-
-
-    if (!element) {
-        return;
-    }
-
-
-    if (
-        value !== undefined &&
-        value !== null &&
-        String(value).trim() !== ""
-    ) {
-
-        element.textContent =
-            value;
-
-    }
-    else {
-
-        element.textContent =
-            "-";
-
-    }
-
-}
-
-
-
-/* =========================================================
-   PROFILE COMPLETION
-========================================================= */
-
-function calculateProfileCompletion(
-    profile
-) {
-
-    if (!profile) {
-        return 0;
-    }
-
-
-    const fields = [
-
+    setValue(
         "registerNumber",
+        student.registerNumber
+    );
 
-        "studentName",
+    setValue(
+        "name",
+        student.name
+    );
 
+    setValue(
         "dob",
+        student.dob
+    );
 
+    setValue(
         "gender",
+        student.gender
+    );
 
+    setValue(
         "department",
+        student.department
+    );
 
+    setValue(
         "section",
+        student.section
+    );
 
-        "institutionalEmail",
+    setValue(
+        "collegeEmail",
+        student.collegeEmail
+    );
 
+    setValue(
+        "personalEmail",
+        student.personalEmail
+    );
+
+    setValue(
         "mobile",
+        student.mobile
+    );
 
+    setValue(
         "category",
+        student.category
+    );
 
+    setValue(
         "address",
+        student.address
+    );
 
+    setValue(
         "studentType",
+        student.studentType
+    );
 
-        "careerGoal"
+    setValue(
+        "hostelName",
+        student.hostelName
+    );
 
-    ];
+    setValue(
+        "hostelRoom",
+        student.hostelRoom
+    );
+
+    setValue(
+        "distanceFromCollege",
+        student.distanceFromCollege
+    );
 
 
-    let completed = 0;
+    if (student.familyDetails) {
+
+        setValue(
+            "fatherName",
+            student.familyDetails.fatherName
+        );
+
+        setValue(
+            "motherName",
+            student.familyDetails.motherName
+        );
+
+        setValue(
+            "fatherOccupation",
+            student.familyDetails.fatherOccupation
+        );
+
+        setValue(
+            "motherOccupation",
+            student.familyDetails.motherOccupation
+        );
+
+        setValue(
+            "familyIncome",
+            student.familyDetails.familyIncome
+        );
+    }
 
 
-    fields.forEach(
-        function (field) {
+    setValue(
+        "hasArrears",
+        student.hasArrears
+            ? "true"
+            : "false"
+    );
 
-            const value =
-                profile[field];
+
+    if (student.technicalProfile) {
+
+        setValue(
+            "programmingLanguages",
+            student.technicalProfile.programmingLanguages
+        );
+
+        setValue(
+            "technicalSkills",
+            student.technicalProfile.technicalSkills
+        );
+
+        setValue(
+            "projects",
+            student.technicalProfile.projects
+        );
+
+        setValue(
+            "certifications",
+            student.technicalProfile.certifications
+        );
+    }
+
+
+    if (student.selfEvaluation) {
+
+        setValue(
+            "strengths",
+            student.selfEvaluation.strengths
+        );
+
+        setValue(
+            "weaknesses",
+            student.selfEvaluation.weaknesses
+        );
+
+        setValue(
+            "interests",
+            student.selfEvaluation.interests
+        );
+
+        setValue(
+            "areasToImprove",
+            student.selfEvaluation.areasToImprove
+        );
+    }
+
+
+    setValue(
+        "careerGoal",
+        student.careerGoal
+    );
+
+
+    if (student.placementDetails) {
+
+        setValue(
+            "targetCompany",
+            student.placementDetails.targetCompany
+        );
+
+        setValue(
+            "targetRole",
+            student.placementDetails.targetRole
+        );
+
+        setValue(
+            "preparationStatus",
+            student.placementDetails.preparationStatus
+        );
+    }
+
+
+    if (student.higherStudiesDetails) {
+
+        setValue(
+            "higherDegree",
+            student.higherStudiesDetails.degree
+        );
+
+        setValue(
+            "higherCountry",
+            student.higherStudiesDetails.country
+        );
+
+        setValue(
+            "higherUniversity",
+            student.higherStudiesDetails.university
+        );
+
+        setValue(
+            "entranceExam",
+            student.higherStudiesDetails.entranceExam
+        );
+    }
+
+
+    if (
+        student.entrepreneurshipDetails
+    ) {
+
+        setValue(
+            "businessIdea",
+            student.entrepreneurshipDetails.businessIdea
+        );
+
+        setValue(
+            "businessDomain",
+            student.entrepreneurshipDetails.businessDomain
+        );
+
+        setValue(
+            "fundingRequired",
+            student.entrepreneurshipDetails.fundingRequired
+        );
+
+        setValue(
+            "teamSize",
+            student.entrepreneurshipDetails.teamSize
+        );
+    }
+}
+
+
+/* =====================================================
+   FACULTY CGPA UPDATE
+===================================================== */
+
+function initializeFacultyForm() {
+
+    const form =
+        document.getElementById(
+            "facultyStudentForm"
+        );
+
+    if (!form) return;
+
+
+    if (!checkFacultyPage()) {
+        return;
+    }
+
+
+    form.addEventListener(
+        "submit",
+        async function (event) {
+
+            event.preventDefault();
+
+
+            const registerNumber =
+                document
+                    .getElementById(
+                        "facultyRegisterNumber"
+                    )
+                    .value.trim();
+
+
+            const name =
+                document
+                    .getElementById(
+                        "facultyStudentName"
+                    )
+                    .value.trim();
+
+
+            const cgpa =
+                Number(
+                    document
+                        .getElementById(
+                            "facultyCgpa"
+                        )
+                        .value
+                );
+
+
+            const mentorRemarks =
+                document
+                    .getElementById(
+                        "mentorRemarks"
+                    )
+                    .value.trim();
+
+
+            const mentorStatus =
+                document
+                    .getElementById(
+                        "mentorStatus"
+                    )
+                    .value;
 
 
             if (
-                value !== undefined &&
-                value !== null &&
-                String(value).trim() !== ""
+                !registerNumber ||
+                !name
             ) {
 
-                completed++;
+                showMessage(
+                    "facultyMessage",
+                    "Register number and name are required.",
+                    "error"
+                );
 
+                return;
+            }
+
+
+            if (
+                isNaN(cgpa) ||
+                cgpa < 0 ||
+                cgpa > 10
+            ) {
+
+                showMessage(
+                    "facultyMessage",
+                    "CGPA must be between 0 and 10.",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            try {
+
+                /*
+                 * Find student
+                 */
+
+                const searchResponse =
+                    await fetch(
+                        `${API_URL}/students/register/${encodeURIComponent(
+                            registerNumber
+                        )}`
+                    );
+
+
+                if (
+                    !searchResponse.ok
+                ) {
+
+                    showMessage(
+                        "facultyMessage",
+                        "Student not found. The student must submit their profile first.",
+                        "error"
+                    );
+
+                    return;
+                }
+
+
+                const searchData =
+                    await searchResponse.json();
+
+
+                const student =
+                    searchData.student;
+
+
+                /*
+                 * Update ONLY faculty fields
+                 */
+
+                const updateResponse =
+                    await fetch(
+                        `${API_URL}/students/${student._id}`,
+                        {
+                            method: "PUT",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body:
+                                JSON.stringify({
+
+                                    cgpa,
+
+                                    mentorRemarks,
+
+                                    mentorStatus
+
+                                })
+                        }
+                    );
+
+
+                const data =
+                    await updateResponse.json();
+
+
+                if (!updateResponse.ok) {
+
+                    showMessage(
+                        "facultyMessage",
+                        data.message ||
+                        "Failed to update CGPA.",
+                        "error"
+                    );
+
+                    return;
+                }
+
+
+                showMessage(
+                    "facultyMessage",
+                    "CGPA updated successfully.",
+                    "success"
+                );
+
+
+                form.reset();
+
+
+            } catch (error) {
+
+                console.error(error);
+
+                showMessage(
+                    "facultyMessage",
+                    "Unable to connect to backend.",
+                    "error"
+                );
             }
 
         }
     );
-
-
-    return Math.round(
-        (
-            completed /
-            fields.length
-        ) * 100
-    );
-
 }
 
 
-
-/* =========================================================
-   FACULTY STUDENT LIST
-========================================================= */
+/* =====================================================
+   STUDENTS PAGE
+===================================================== */
 
 function initializeStudentsPage() {
 
@@ -3015,1432 +1850,837 @@ function initializeStudentsPage() {
             "studentTableBody"
         );
 
+    if (!tableBody) return;
 
-    if (!tableBody) {
+
+    if (!checkFacultyPage()) {
         return;
     }
-
-
-    renderStudentTable();
 
 
     const search =
         document.getElementById(
             "searchInput"
         );
-
-
-    const filters = [
-
-        "departmentFilter",
-
-        "sectionFilter",
-
-        "categoryFilter",
-
-        "careerFilter",
-
-        "cgpaFilter",
-
-        "arrearFilter"
-
-    ];
-
-
-    if (search) {
-
-        search.addEventListener(
-            "input",
-            renderStudentTable
-        );
-
-    }
-
-
-    filters.forEach(
-        function (id) {
-
-            const element =
-                document.getElementById(
-                    id
-                );
-
-
-            if (element) {
-
-                element.addEventListener(
-                    "change",
-                    renderStudentTable
-                );
-
-            }
-
-        }
-    );
-
-
-    const clearButton =
-        document.getElementById(
-            "clearFilters"
-        );
-
-
-    if (clearButton) {
-
-        clearButton.addEventListener(
-            "click",
-            function () {
-
-                if (search) {
-                    search.value = "";
-                }
-
-
-                filters.forEach(
-                    function (id) {
-
-                        const element =
-                            document.getElementById(
-                                id
-                            );
-
-
-                        if (element) {
-
-                            element.value =
-                                "All";
-
-                        }
-
-                    }
-                );
-
-
-                renderStudentTable();
-
-            }
-        );
-
-    }
-
-}
-
-
-
-/* =========================================================
-   GET ALL STUDENTS
-========================================================= */
-
-function getAllStudents() {
-
-    let students = [];
-
-
-    try {
-
-        students =
-            JSON.parse(
-                localStorage.getItem(
-                    "students"
-                )
-            ) || [];
-
-    }
-    catch (error) {
-
-        students = [];
-
-    }
-
-
-    /* ADD PROFILE IF LIST EMPTY */
-
-    const profile =
-        getStudentProfile();
-
-
-    if (
-        profile &&
-        profile.registerNumber
-    ) {
-
-        const exists =
-            students.some(
-                function (student) {
-
-                    return (
-                        student.registerNumber ===
-                        profile.registerNumber
-                    );
-
-                }
-            );
-
-
-        if (!exists) {
-
-            students.push(
-                profile
-            );
-
-        }
-
-    }
-
-
-    return students;
-
-}
-
-
-
-/* =========================================================
-   RENDER STUDENT TABLE
-========================================================= */
-
-function renderStudentTable() {
-
-    const tableBody =
-        document.getElementById(
-            "studentTableBody"
-        );
-
-
-    if (!tableBody) {
-        return;
-    }
-
-
-    const students =
-        getFilteredStudents();
-
-
-    tableBody.innerHTML = "";
-
-
-    if (
-        students.length === 0
-    ) {
-
-        const row =
-            document.createElement(
-                "tr"
-            );
-
-
-        row.innerHTML = `
-
-            <td colspan="10"
-                class="empty-table">
-
-                No student records found.
-
-            </td>
-
-        `;
-
-
-        tableBody.appendChild(
-            row
-        );
-
-
-        return;
-    }
-
-
-    students.forEach(
-        function (
-            student,
-            index
-        ) {
-
-            const row =
-                document.createElement(
-                    "tr"
-                );
-
-
-            const cgpa =
-                getStudentCgpa(
-                    student
-                );
-
-
-            const arrears =
-                getStudentArrears(
-                    student
-                );
-
-
-            const careerGoal =
-                student.careerGoal ||
-                "-";
-
-
-            row.innerHTML = `
-
-                <td>
-                    ${index + 1}
-                </td>
-
-                <td>
-                    ${escapeHtml(
-                        student.registerNumber ||
-                        "-"
-                    )}
-                </td>
-
-                <td>
-                    ${escapeHtml(
-                        student.studentName ||
-                        student.name ||
-                        "-"
-                    )}
-                </td>
-
-                <td>
-                    ${escapeHtml(
-                        student.department ||
-                        "-"
-                    )}
-                </td>
-
-                <td>
-                    ${escapeHtml(
-                        student.section ||
-                        "-"
-                    )}
-                </td>
-
-                <td>
-                    ${escapeHtml(
-                        student.category ||
-                        student.studentCategory ||
-                        "-"
-                    )}
-                </td>
-
-                <td>
-                    ${cgpa}
-                </td>
-
-                <td>
-                    ${arrears}
-                </td>
-
-                <td>
-                    ${escapeHtml(
-                        careerGoal
-                    )}
-                </td>
-
-                <td>
-
-                    <button
-                        type="button"
-                        class="table-view-button"
-                        onclick="viewStudent(
-                            '${encodeURIComponent(
-                                student.registerNumber || ""
-                            )}'
-                        )"
-                    >
-                        View
-                    </button>
-
-                </td>
-
-            `;
-
-
-            tableBody.appendChild(
-                row
-            );
-
-        }
-    );
-
-}
-
-
-
-/* =========================================================
-   FILTER STUDENTS
-========================================================= */
-
-function getFilteredStudents() {
-
-    let students =
-        getAllStudents();
-
-
-    const search =
-        getElementValue(
-            "searchInput"
-        ).toLowerCase();
-
 
     const department =
-        getElementValue(
+        document.getElementById(
             "departmentFilter"
         );
 
-
     const section =
-        getElementValue(
+        document.getElementById(
             "sectionFilter"
         );
 
-
     const category =
-        getElementValue(
+        document.getElementById(
             "categoryFilter"
         );
 
-
     const career =
-        getElementValue(
+        document.getElementById(
             "careerFilter"
         );
 
-
-    const cgpaFilter =
-        getElementValue(
-            "cgpaFilter"
-        );
-
-
-    const arrearFilter =
-        getElementValue(
+    const arrear =
+        document.getElementById(
             "arrearFilter"
         );
 
 
-    students =
-        students.filter(
-            function (student) {
+    const loadStudents =
+        async function () {
 
-                const name =
-                    (
-                        student.studentName ||
-                        student.name ||
-                        ""
-                    ).toLowerCase();
+            try {
+
+                const params =
+                    new URLSearchParams();
 
 
-                const registerNumber =
-                    (
-                        student.registerNumber ||
-                        ""
-                    ).toLowerCase();
+                if (search.value) {
+
+                    params.set(
+                        "search",
+                        search.value
+                    );
+                }
 
 
-                const studentDepartment =
-                    student.department ||
-                    "";
+                if (department.value) {
+
+                    params.set(
+                        "department",
+                        department.value
+                    );
+                }
 
 
-                const studentSection =
-                    student.section ||
-                    "";
+                if (section.value) {
+
+                    params.set(
+                        "section",
+                        section.value
+                    );
+                }
 
 
-                const studentCategory =
-                    student.category ||
-                    student.studentCategory ||
-                    "";
+                if (category.value) {
+
+                    params.set(
+                        "category",
+                        category.value
+                    );
+                }
 
 
-                const studentCareer =
-                    student.careerGoal ||
-                    "";
+                if (career.value) {
+
+                    params.set(
+                        "careerGoal",
+                        career.value
+                    );
+                }
 
 
-                const studentCgpa =
-                    getStudentCgpa(
-                        student
+                if (arrear.value) {
+
+                    params.set(
+                        "arrearStatus",
+                        arrear.value
+                    );
+                }
+
+
+                const response =
+                    await fetch(
+                        `${API_URL}/students?${params.toString()}`
                     );
 
 
-                const studentArrears =
-                    getStudentArrears(
-                        student
+                const data =
+                    await response.json();
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        data.message
                     );
-
-
-                if (
-                    search &&
-                    !name.includes(search) &&
-                    !registerNumber.includes(search)
-                ) {
-
-                    return false;
-
                 }
 
 
-                if (
-                    department &&
-                    department !== "All" &&
-                    studentDepartment !== department
-                ) {
-
-                    return false;
-
-                }
+                tableBody.innerHTML = "";
 
 
                 if (
-                    section &&
-                    section !== "All" &&
-                    studentSection !== section
+                    data.students.length === 0
                 ) {
 
-                    return false;
+                    tableBody.innerHTML = `
 
+                        <tr>
+
+                            <td
+                                colspan="9"
+                                style="text-align:center;">
+
+                                No students found.
+
+                            </td>
+
+                        </tr>
+
+                    `;
+
+                    return;
                 }
 
 
-                if (
-                    category &&
-                    category !== "All" &&
-                    studentCategory !== category
-                ) {
+                data.students.forEach(
+                    (student, index) => {
 
-                    return false;
-
-                }
+                        const row =
+                            document.createElement(
+                                "tr"
+                            );
 
 
-                if (
-                    career &&
-                    career !== "All" &&
-                    studentCareer !== career
-                ) {
+                        row.innerHTML = `
 
-                    return false;
+                            <td>
+                                ${index + 1}
+                            </td>
 
-                }
+                            <td>
+                                ${student.registerNumber || "-"}
+                            </td>
 
+                            <td>
+                                ${student.name || "-"}
+                            </td>
 
-                if (
-                    cgpaFilter &&
-                    cgpaFilter !== "All"
-                ) {
+                            <td>
+                                ${student.department || "-"}
+                            </td>
 
-                    const cgpa =
-                        parseFloat(
-                            studentCgpa
-                        );
+                            <td>
+                                ${student.section || "-"}
+                            </td>
 
+                            <td>
+                                ${
+                                    student.cgpa
+                                    ? Number(student.cgpa).toFixed(2)
+                                    : "-"
+                                }
+                            </td>
 
-                    if (
-                        cgpaFilter === "Below 6" &&
-                        !(cgpa < 6)
-                    ) {
+                            <td>
+                                ${student.careerGoal || "-"}
+                            </td>
 
-                        return false;
+                            <td>
 
-                    }
+                                ${
+                                    student.hasArrears
+                                    ? '<span class="badge badge-red">Yes</span>'
+                                    : '<span class="badge badge-green">No</span>'
+                                }
 
+                            </td>
 
-                    if (
-                        cgpaFilter === "6 - 7" &&
-                        !(cgpa >= 6 && cgpa < 7)
-                    ) {
+                            <td>
 
-                        return false;
+                                <a
+                                    href="student-view.html?id=${student._id}"
+                                    class="btn btn-primary">
 
-                    }
+                                    View
 
+                                </a>
 
-                    if (
-                        cgpaFilter === "7 - 8" &&
-                        !(cgpa >= 7 && cgpa < 8)
-                    ) {
+                            </td>
 
-                        return false;
-
-                    }
-
-
-                    if (
-                        cgpaFilter === "8 - 9" &&
-                        !(cgpa >= 8 && cgpa < 9)
-                    ) {
-
-                        return false;
-
-                    }
+                        `;
 
 
-                    if (
-                        cgpaFilter === "9 - 10" &&
-                        !(cgpa >= 9 && cgpa <= 10)
-                    ) {
-
-                        return false;
+                        tableBody.appendChild(row);
 
                     }
-
-                }
-
-
-                if (
-                    arrearFilter &&
-                    arrearFilter !== "All"
-                ) {
-
-                    if (
-                        arrearFilter === "With Arrears" &&
-                        studentArrears <= 0
-                    ) {
-
-                        return false;
-
-                    }
+                );
 
 
-                    if (
-                        arrearFilter === "No Arrears" &&
-                        studentArrears > 0
-                    ) {
+            } catch (error) {
 
-                        return false;
+                console.error(error);
 
-                    }
+                tableBody.innerHTML = `
 
-                }
+                    <tr>
 
+                        <td
+                            colspan="9"
+                            style="text-align:center;">
 
-                return true;
+                            Failed to load students.
 
+                        </td>
+
+                    </tr>
+
+                `;
             }
-        );
-
-
-    return students;
-
-}
-
-
-
-/* =========================================================
-   STUDENT CGPA
-========================================================= */
-
-function getStudentCgpa(
-    student
-) {
-
-    if (
-        student.cgpa !== undefined &&
-        student.cgpa !== ""
-    ) {
-
-        return Number(
-            student.cgpa
-        ).toFixed(2);
-
-    }
-
-
-    if (
-        Array.isArray(
-            student.semesters
-        )
-    ) {
-
-        const values =
-            student.semesters
-                .map(
-                    function (semester) {
-
-                        return parseFloat(
-                            semester.cgpa
-                        );
-
-                    }
-                )
-                .filter(
-                    function (value) {
-
-                        return !isNaN(
-                            value
-                        );
-
-                    }
-                );
-
-
-        if (values.length > 0) {
-
-            const total =
-                values.reduce(
-                    function (
-                        sum,
-                        value
-                    ) {
-
-                        return (
-                            sum + value
-                        );
-
-                    },
-                    0
-                );
-
-
-            return (
-                total /
-                values.length
-            ).toFixed(2);
-
-        }
-
-    }
-
-
-    return "-";
-
-}
-
-
-
-/* =========================================================
-   STUDENT ARREARS
-========================================================= */
-
-function getStudentArrears(
-    student
-) {
-
-    if (
-        Array.isArray(
-            student.arrears
-        )
-    ) {
-
-        return student.arrears.filter(
-            function (arrear) {
-
-                return (
-                    !arrear.status ||
-                    arrear.status
-                        .toLowerCase() !==
-                        "cleared"
-                );
-
-            }
-        ).length;
-
-    }
-
-
-    if (
-        student.totalArrears !== undefined
-    ) {
-
-        return Number(
-            student.totalArrears
-        ) || 0;
-
-    }
-
-
-    return 0;
-
-}
-
-
-
-/* =========================================================
-   VIEW STUDENT
-========================================================= */
-
-function viewStudent(
-    registerNumber
-) {
-
-    const decoded =
-        decodeURIComponent(
-            registerNumber
-        );
-
-
-    localStorage.setItem(
-        "selectedStudent",
-        decoded
-    );
-
-
-    window.location.href =
-        "student-view.html";
-
-}
-
-
-
-/* =========================================================
-   STUDENT VIEW PAGE
-========================================================= */
-
-function initializeStudentView() {
-
-    const name =
-        document.getElementById(
-            "viewStudentName"
-        );
-
-
-    if (!name) {
-        return;
-    }
-
-
-    const selected =
-        localStorage.getItem(
-            "selectedStudent"
-        );
-
-
-    const students =
-        getAllStudents();
-
-
-    const student =
-        students.find(
-            function (item) {
-
-                return (
-                    item.registerNumber ===
-                    selected
-                );
-
-            }
-        );
-
-
-    if (!student) {
-        return;
-    }
-
-
-    const values = {
-
-        viewStudentName:
-            student.studentName ||
-            "-",
-
-        viewRegisterNumber:
-            student.registerNumber ||
-            "-",
-
-        viewDepartment:
-            student.department ||
-            "-",
-
-        viewSection:
-            student.section ||
-            "-",
-
-        viewCategory:
-            student.category ||
-            student.studentCategory ||
-            "-",
-
-        viewCgpa:
-            getStudentCgpa(
-                student
-            ),
-
-        viewArrears:
-            getStudentArrears(
-                student
-            ),
-
-        viewCareerGoal:
-            student.careerGoal ||
-            "-",
-
-        viewEmail:
-            student.institutionalEmail ||
-            "-",
-
-        viewMobile:
-            student.mobile ||
-            "-"
-
-    };
-
-
-    Object.keys(values).forEach(
-        function (id) {
-
-            setDashboardText(
-                id,
-                values[id]
+        };
+
+
+    [
+        search,
+        department,
+        section,
+        category,
+        career,
+        arrear
+    ].forEach(element => {
+
+        if (element) {
+
+            element.addEventListener(
+                "input",
+                loadStudents
             );
 
+            element.addEventListener(
+                "change",
+                loadStudents
+            );
         }
-    );
 
+    });
+
+
+    loadStudents();
 }
 
 
-
-/* =========================================================
+/* =====================================================
    FACULTY DASHBOARD
-========================================================= */
+===================================================== */
 
-function initializeFacultyDashboard() {
+async function initializeFacultyDashboard() {
 
     const total =
         document.getElementById(
             "totalStudents"
         );
 
+    if (!total) return;
 
-    if (!total) {
+
+    if (!checkFacultyPage()) {
         return;
     }
 
 
-    updateFacultyDashboard();
+    try {
 
-}
-
-
-
-/* =========================================================
-   UPDATE FACULTY DASHBOARD
-========================================================= */
-
-function updateFacultyDashboard() {
-
-    const students =
-        getAllStudents();
+        const response =
+            await fetch(
+                `${API_URL}/students`
+            );
 
 
-    const totalStudents =
-        students.length;
+        const data =
+            await response.json();
 
 
-    let hostellers = 0;
-
-    let dayScholars = 0;
-
-    let totalCgpa = 0;
-
-    let cgpaCount = 0;
-
-    let highestCgpa = 0;
-
-    let lowestCgpa = 10;
-
-    let activeArrears = 0;
-
-    let totalArrears = 0;
-
-    let clearedArrears = 0;
-
-    let placement = 0;
-
-    let higherStudies = 0;
-
-    let entrepreneurship = 0;
-
-    let remedial = 0;
-
-    let withoutProjects = 0;
+        if (!response.ok) {
+            throw new Error(
+                data.message
+            );
+        }
 
 
+        const students =
+            data.students;
 
-    students.forEach(
-        function (student) {
+
+        total.textContent =
+            students.length;
 
 
-            /* STUDENT TYPE */
+        let hostellers = 0;
 
-            const type =
-                (
-                    student.studentType ||
-                    ""
-                ).toLowerCase();
+        let dayScholars = 0;
 
+        let cgpas = [];
+
+        let arrears = 0;
+
+        let placement = 0;
+
+        let higherStudies = 0;
+
+        let entrepreneurship = 0;
+
+
+        students.forEach(student => {
 
             if (
-                type === "hosteller"
+                student.studentType ===
+                "Hosteller"
             ) {
 
                 hostellers++;
-
             }
-            else if (
-                type === "day scholar"
+
+
+            if (
+                student.studentType ===
+                "Day Scholar"
             ) {
 
                 dayScholars++;
-
             }
 
-
-
-            /* CGPA */
-
-            const cgpa =
-                parseFloat(
-                    getStudentCgpa(
-                        student
-                    )
-                );
-
-
-            if (!isNaN(cgpa)) {
-
-                totalCgpa += cgpa;
-
-                cgpaCount++;
-
-
-                if (
-                    cgpa > highestCgpa
-                ) {
-
-                    highestCgpa =
-                        cgpa;
-
-                }
-
-
-                if (
-                    cgpa < lowestCgpa
-                ) {
-
-                    lowestCgpa =
-                        cgpa;
-
-                }
-
-
-                if (
-                    cgpa < 6
-                ) {
-
-                    remedial++;
-
-                }
-
-            }
-
-
-
-            /* ARREARS */
 
             if (
-                Array.isArray(
-                    student.arrears
-                )
+                Number(student.cgpa) > 0
             ) {
 
-                student.arrears.forEach(
-                    function (arrear) {
-
-                        totalArrears++;
-
-
-                        if (
-                            arrear.status &&
-                            arrear.status
-                                .toLowerCase() ===
-                                "cleared"
-                        ) {
-
-                            clearedArrears++;
-
-                        }
-                        else {
-
-                            activeArrears++;
-
-                        }
-
-                    }
+                cgpas.push(
+                    Number(student.cgpa)
                 );
-
             }
-            else {
-
-                activeArrears +=
-                    getStudentArrears(
-                        student
-                    );
-
-            }
-
-
-
-            /* CAREER GOAL */
-
-            const career =
-                (
-                    student.careerGoal ||
-                    ""
-                ).toLowerCase();
 
 
             if (
-                career ===
-                "placement"
+                student.hasArrears
+            ) {
+
+                arrears++;
+            }
+
+
+            if (
+                student.careerGoal ===
+                "Placement"
             ) {
 
                 placement++;
-
             }
 
 
             if (
-                career ===
-                "higher studies"
+                student.careerGoal ===
+                "Higher Studies"
             ) {
 
                 higherStudies++;
-
             }
 
 
             if (
-                career ===
-                "entrepreneurship"
+                student.careerGoal ===
+                "Entrepreneurship"
             ) {
 
                 entrepreneurship++;
-
             }
 
+        });
 
 
-            /* PROJECT */
-
-            if (
-                !student.project &&
-                !student.projects &&
-                !student.projectTitle
-            ) {
-
-                withoutProjects++;
-
-            }
-
-        }
-    );
+        const average =
+            cgpas.length
+                ? cgpas.reduce(
+                    (a, b) => a + b,
+                    0
+                ) / cgpas.length
+                : 0;
 
 
-    const averageCgpa =
-        cgpaCount > 0
-            ? (
-                totalCgpa /
-                cgpaCount
-            ).toFixed(2)
-            : "-";
+        const highest =
+            cgpas.length
+                ? Math.max(...cgpas)
+                : 0;
 
 
-    if (
-        lowestCgpa === 10 &&
-        cgpaCount === 0
-    ) {
+        const lowest =
+            cgpas.length
+                ? Math.min(...cgpas)
+                : 0;
 
-        lowestCgpa = "-";
 
+        document.getElementById(
+            "hostellerCount"
+        ).textContent =
+            hostellers;
+
+
+        document.getElementById(
+            "dayScholarCount"
+        ).textContent =
+            dayScholars;
+
+
+        document.getElementById(
+            "averageCgpa"
+        ).textContent =
+            average.toFixed(2);
+
+
+        document.getElementById(
+            "highestCgpa"
+        ).textContent =
+            highest.toFixed(2);
+
+
+        document.getElementById(
+            "lowestCgpa"
+        ).textContent =
+            lowest.toFixed(2);
+
+
+        document.getElementById(
+            "activeArrears"
+        ).textContent =
+            arrears;
+
+
+        document.getElementById(
+            "placementCount"
+        ).textContent =
+            placement;
+
+
+        document.getElementById(
+            "higherStudiesCount"
+        ).textContent =
+            higherStudies;
+
+
+        document.getElementById(
+            "entrepreneurshipCount"
+        ).textContent =
+            entrepreneurship;
+
+
+    } catch (error) {
+
+        console.error(
+            "Dashboard error:",
+            error
+        );
     }
-
-
-    /* DISPLAY */
-
-    setDashboardText(
-        "totalStudents",
-        totalStudents
-    );
-
-
-    setDashboardText(
-        "hostellerCount",
-        hostellers
-    );
-
-
-    setDashboardText(
-        "dayScholarCount",
-        dayScholars
-    );
-
-
-    setDashboardText(
-        "averageCgpa",
-        averageCgpa
-    );
-
-
-    setDashboardText(
-        "highestCgpa",
-        cgpaCount > 0
-            ? highestCgpa.toFixed(2)
-            : "-"
-    );
-
-
-    setDashboardText(
-        "lowestCgpa",
-        cgpaCount > 0
-            ? lowestCgpa.toFixed(2)
-            : "-"
-    );
-
-
-    setDashboardText(
-        "activeArrears",
-        activeArrears
-    );
-
-
-    setDashboardText(
-        "totalArrears",
-        totalArrears
-    );
-
-
-    setDashboardText(
-        "pendingArrears",
-        activeArrears
-    );
-
-
-    setDashboardText(
-        "clearedArrears",
-        clearedArrears
-    );
-
-
-    setDashboardText(
-        "placementCount",
-        placement
-    );
-
-
-    setDashboardText(
-        "higherStudiesCount",
-        higherStudies
-    );
-
-
-    setDashboardText(
-        "entrepreneurshipCount",
-        entrepreneurship
-    );
-
-
-    setDashboardText(
-        "remedialStudents",
-        remedial
-    );
-
-
-    setDashboardText(
-        "withoutProjects",
-        withoutProjects
-    );
-
-
-    setDashboardText(
-        "mentorIntervention",
-        activeArrears +
-        remedial
-    );
-
 }
 
 
+/* =====================================================
+   STUDENT DASHBOARD
+===================================================== */
 
-/* =========================================================
-   ADD STUDENT PAGE
-========================================================= */
+async function initializeStudentDashboard() {
 
-function initializeAddStudent() {
-
-    const form =
+    const dashboard =
         document.getElementById(
-            "addStudentForm"
+            "studentDashboard"
         );
 
+    if (!dashboard) return;
 
-    if (!form) {
+
+    if (!checkStudentPage()) {
         return;
     }
 
 
-    form.noValidate = true;
+    const user =
+        getLoggedUser();
 
 
-    form.addEventListener(
-        "submit",
-        function (event) {
-
-            event.preventDefault();
-
-
-            const formData =
-                new FormData(form);
+    if (!user ||
+        !user.registerNumber) {
+        return;
+    }
 
 
-            const student = {};
+    try {
 
-
-            formData.forEach(
-                function (value, key) {
-
-                    student[key] =
-                        value;
-
-                }
+        const response =
+            await fetch(
+                `${API_URL}/students/register/${encodeURIComponent(
+                    user.registerNumber
+                )}`
             );
 
 
-            saveStudentToList(
-                student
-            );
-
-
-            alert(
-                "Student added successfully."
-            );
-
-
-            form.reset();
-
+        if (!response.ok) {
+            return;
         }
-    );
-
-}
 
 
-
-/* =========================================================
-   NAVIGATION
-========================================================= */
-
-function initializeNavigation() {
-
-    const logoutLinks =
-        document.querySelectorAll(
-            "#logoutLink, .logout-link"
-        );
+        const data =
+            await response.json();
 
 
-    logoutLinks.forEach(
-        function (link) {
-
-            link.addEventListener(
-                "click",
-                function (event) {
-
-                    event.preventDefault();
+        const student =
+            data.student;
 
 
-                    localStorage.removeItem(
-                        "userRole"
-                    );
-
-
-                    localStorage.removeItem(
-                        "loggedInUser"
-                    );
-
-
-                    window.location.href =
-                        "index.html";
-
-                }
-            );
-
-        }
-    );
-
-}
-
-
-
-/* =========================================================
-   HELPER - GET ELEMENT VALUE
-========================================================= */
-
-function getElementValue(
-    id
-) {
-
-    const element =
         document.getElementById(
-            id
-        );
+            "studentName"
+        ).textContent =
+            student.name || "-";
 
 
-    if (!element) {
-        return "";
+        document.getElementById(
+            "studentRegisterNumber"
+        ).textContent =
+            student.registerNumber || "-";
+
+
+        document.getElementById(
+            "studentCgpa"
+        ).textContent =
+            student.cgpa
+                ? Number(
+                    student.cgpa
+                ).toFixed(2)
+                : "Not entered";
+
+
+        document.getElementById(
+            "studentCareerGoal"
+        ).textContent =
+            student.careerGoal || "-";
+
+
+    } catch (error) {
+
+        console.error(error);
     }
-
-
-    return (
-        element.value || ""
-    ).trim();
-
 }
 
 
+/* =====================================================
+   STUDENT VIEW
+===================================================== */
 
-/* =========================================================
-   HTML ESCAPE
-========================================================= */
+async function initializeStudentView() {
 
-function escapeHtml(
-    value
-) {
+    const view =
+        document.getElementById(
+            "studentView"
+        );
 
-    if (
-        value === undefined ||
-        value === null
-    ) {
+    if (!view) return;
 
-        return "";
 
+    if (!checkFacultyPage()) {
+        return;
     }
 
 
-    return String(value)
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
+    const params =
+        new URLSearchParams(
+            window.location.search
         );
 
+
+    const id =
+        params.get("id");
+
+
+    if (!id) {
+
+        view.innerHTML =
+            "Student ID not found.";
+
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `${API_URL}/students/${id}`
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            view.innerHTML =
+                data.message;
+
+            return;
+        }
+
+
+        const student =
+            data.student;
+
+
+        view.innerHTML = `
+
+            <div class="card">
+
+                <h2>Personal Details</h2>
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+
+                        <label>Register Number</label>
+
+                        <input
+                            value="${student.registerNumber || ""}"
+                            readonly>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>Name</label>
+
+                        <input
+                            value="${student.name || ""}"
+                            readonly>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>Department</label>
+
+                        <input
+                            value="${student.department || ""}"
+                            readonly>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>Section</label>
+
+                        <input
+                            value="${student.section || ""}"
+                            readonly>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>Student Type</label>
+
+                        <input
+                            value="${student.studentType || ""}"
+                            readonly>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <h2>Academic Details</h2>
+
+                <div class="dashboard-grid">
+
+                    <div class="stat-card">
+
+                        <h3>CGPA</h3>
+
+                        <p>
+
+                            ${
+                                student.cgpa
+                                ? Number(student.cgpa).toFixed(2)
+                                : "Not entered"
+                            }
+
+                        </p>
+
+                    </div>
+
+
+                    <div class="stat-card">
+
+                        <h3>Arrears</h3>
+
+                        <p>
+
+                            ${
+                                student.hasArrears
+                                ? "Yes"
+                                : "No"
+                            }
+
+                        </p>
+
+                    </div>
+
+
+                    <div class="stat-card">
+
+                        <h3>Career Goal</h3>
+
+                        <p style="font-size:20px;">
+
+                            ${
+                                student.careerGoal || "-"
+                            }
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <h2>Mentor Information</h2>
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+
+                        <label>Mentor Status</label>
+
+                        <input
+                            value="${student.mentorStatus || ""}"
+                            readonly>
+
+                    </div>
+
+
+                    <div class="form-group full">
+
+                        <label>Mentor Remarks</label>
+
+                        <textarea readonly>${student.mentorRemarks || ""}</textarea>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        `;
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        view.innerHTML =
+            "Failed to load student.";
+    }
 }
 
 
+/* =====================================================
+   PAGE INITIALIZATION
+===================================================== */
 
-/* =========================================================
-   END OF APP.JS
-========================================================= */
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        initializeLogin();
+
+        initializeStudentType();
+
+        initializeCareerGoal();
+
+        initializeArrears();
+
+        initializeStudentProfile();
+
+        initializeFacultyForm();
+
+        initializeStudentsPage();
+
+        initializeFacultyDashboard();
+
+        initializeStudentDashboard();
+
+        initializeStudentView();
+
+    }
+);
