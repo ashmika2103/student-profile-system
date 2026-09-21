@@ -595,3 +595,329 @@ footer {
         width: 100%;
     }
 }
+/* =========================
+   LOGIN CONTAINER
+========================= */
+
+.login-container {
+    position: relative;
+
+    width: 100%;
+    max-width: 550px;
+
+    background: white;
+
+    padding: 40px;
+
+    border-radius: 15px;
+
+    box-shadow:
+        0 5px 25px rgba(0, 0, 0, 0.12);
+}
+
+
+/* =========================
+   LOGIN HEADER
+========================= */
+
+.login-header {
+    text-align: center;
+
+    margin-bottom: 30px;
+
+    padding-top: 20px;
+}
+
+.login-header h1 {
+    font-size: 35px;
+
+    margin: 0 0 10px;
+}
+
+.login-header p {
+    color: #64748b;
+
+    font-size: 17px;
+
+    margin: 0;
+}
+
+
+/* =========================
+   REGISTER TOP BUTTON
+========================= */
+
+.register-top {
+    position: absolute;
+
+    top: 20px;
+    right: 25px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    font-size: 14px;
+}
+
+.register-top span {
+    color: #64748b;
+}
+
+.register-button {
+    display: inline-block;
+
+    padding: 8px 15px;
+
+    border: 1px solid #2563eb;
+
+    border-radius: 6px;
+
+    color: #2563eb;
+
+    background: white;
+
+    font-size: 14px;
+
+    font-weight: bold;
+
+    transition: 0.2s;
+}
+
+.register-button:hover {
+    background: #2563eb;
+
+    color: white;
+}
+
+
+/* =========================
+   LOGIN BUTTON
+========================= */
+
+.login-button-container {
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    margin-top: 25px;
+}
+
+.login-button {
+    min-width: 140px;
+
+    padding: 13px 30px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    background: #2563eb;
+
+    color: white;
+
+    font-size: 17px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.login-button:hover {
+    background: #1d4ed8;
+}
+
+
+/* =========================
+   REGISTER PAGE
+========================= */
+
+.register-page {
+    min-height: 100vh;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    padding: 30px;
+}
+
+.register-container {
+    width: 100%;
+
+    max-width: 550px;
+
+    background: white;
+
+    padding: 40px;
+
+    border-radius: 15px;
+
+    box-shadow:
+        0 5px 25px rgba(0, 0, 0, 0.12);
+}
+
+
+/* =========================
+   REGISTER HEADER
+========================= */
+
+.register-header {
+    text-align: center;
+
+    margin-bottom: 30px;
+}
+
+.register-header h1 {
+    font-size: 32px;
+
+    margin: 0 0 10px;
+}
+
+.register-header p {
+    color: #64748b;
+
+    font-size: 17px;
+
+    margin: 0;
+}
+
+
+/* =========================
+   REGISTER BUTTONS
+========================= */
+
+.register-button-container {
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 15px;
+
+    margin-top: 25px;
+}
+
+.register-submit-button {
+    padding: 13px 22px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    background: #2563eb;
+
+    color: white;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.register-submit-button:hover {
+    background: #1d4ed8;
+}
+
+.back-login-button {
+    padding: 12px 22px;
+
+    border: 1px solid #2563eb;
+
+    border-radius: 7px;
+
+    color: #2563eb;
+
+    background: white;
+
+    font-size: 16px;
+
+    font-weight: bold;
+}
+
+.back-login-button:hover {
+    background: #2563eb;
+
+    color: white;
+}
+
+
+/* =========================
+   REGISTER MESSAGE
+========================= */
+
+.register-message {
+    display: none;
+
+    padding: 12px;
+
+    margin-top: 15px;
+
+    border-radius: 7px;
+
+    font-size: 14px;
+
+    font-weight: bold;
+}
+
+.register-message.success {
+    display: block;
+
+    color: #166534;
+
+    background: #dcfce7;
+
+    border: 1px solid #22c55e;
+}
+
+.register-message.error {
+    display: block;
+
+    color: #991b1b;
+
+    background: #fee2e2;
+
+    border: 1px solid #ef4444;
+}
+
+
+/* =========================
+   REGISTER RESPONSIVE
+========================= */
+
+@media (max-width: 600px) {
+
+    .login-container,
+    .register-container {
+        padding: 25px;
+    }
+
+    .register-top {
+        right: 20px;
+    }
+
+    .register-top span {
+        display: none;
+    }
+
+    .register-button-container {
+        flex-direction: column;
+    }
+
+    .register-submit-button,
+    .back-login-button {
+        width: 100%;
+
+        text-align: center;
+
+        box-sizing: border-box;
+    }
+}

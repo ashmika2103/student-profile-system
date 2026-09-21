@@ -1,144 +1,107 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Student Profiling System - Login</title>
 
-    <link rel="stylesheet"
-          href="css/style.css">
-
+    <link rel="stylesheet" href="css/style.css">
 </head>
-
 
 <body>
 
-<div class="login-page">
+    <div class="login-page">
 
-    <div class="login-card">
+        <div class="login-container">
 
-        <h1>🎓</h1>
-
-        <h1>Login</h1>
-
-        <p>
-            Select your role and enter your credentials
-        </p>
-
-
-        <div id="loginError"></div>
-
-
-        <form id="loginForm"
-              novalidate>
-
-
-            <div class="form-group">
-
-                <label>
-                    Login As
-                </label>
-
-                <select id="role"
-                        required>
-
-                    <option value="Student">
-                        Student
-                    </option>
-
-                    <option value="Faculty">
-                        Faculty
-                    </option>
-
-                </select>
-
+            <!-- Register button - TOP RIGHT -->
+            <div class="register-top">
+                <span>New Student?</span>
+                <a href="student-register.html" class="register-button">
+                    Register
+                </a>
             </div>
 
-
-            <br>
-
-
-            <div class="form-group">
-
-                <label id="loginIdLabel">
-                    Register Number / Faculty ID
-                </label>
-
-                <input
-                    type="text"
-                    id="loginId"
-                    placeholder="Enter login ID"
-                    required>
-
+            <!-- Login Header -->
+            <div class="login-header">
+                <h1>Student Profiling System</h1>
+                <p>
+                    Student Academic Personal and Career Profiling System
+                </p>
             </div>
 
+            <!-- Login Form -->
+            <form id="loginForm">
 
-            <br>
+                <div class="form-group">
+                    <label for="loginId">Login ID</label>
 
+                    <input
+                        type="text"
+                        id="loginId"
+                        name="loginId"
+                        placeholder="Enter Login ID"
+                        autocomplete="username"
+                        required
+                    >
+                </div>
 
-            <div class="form-group">
+                <div class="form-group">
+                    <label for="password">Password</label>
 
-                <label>
-                    Password
-                </label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter Password"
+                        autocomplete="current-password"
+                        required
+                    >
+                </div>
 
-                <input
-                    type="password"
-                    id="password"
-                    placeholder="Enter password"
-                    required>
+                <div class="form-group">
+                    <label for="role">Role</label>
 
-            </div>
+                    <select
+                        id="role"
+                        name="role"
+                        required
+                    >
+                        <option value="">Select Role</option>
+                        <option value="Student">Student</option>
+                        <option value="Faculty">Faculty</option>
+                    </select>
+                </div>
 
+                <!-- Login error -->
+                <div
+                    id="loginError"
+                    class="error-message"
+                ></div>
 
-            <div class="button-container">
+                <!-- Login button -->
+                <div class="login-button-container">
+                    <button
+                        type="submit"
+                        class="login-button"
+                    >
+                        Login
+                    </button>
+                </div>
 
-                <button
-                    type="submit"
-                    class="btn btn-primary">
-
-                    Login
-
-                </button>
-
-            </div>
-
-
-        </form>
-
-
-        <div class="demo-login">
-
-            <h3>Demo Login</h3>
-
-            <p>
-                Student:
-                <strong>24BCS034</strong>
-                /
-                <strong>student123</strong>
-            </p>
-
-            <p>
-                Faculty:
-                <strong>FAC001</strong>
-                /
-                <strong>faculty123</strong>
-            </p>
+            </form>
 
         </div>
 
     </div>
 
-</div>
-
-
-<script src="js/app.js"></script>
+    <!-- Your existing JavaScript -->
+    <script src="js/app.js"></script>
 
 </body>
 
 </html>
+```
