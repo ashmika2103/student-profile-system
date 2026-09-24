@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
-
+<script src="js/app.js"></script>
+<script src="js/navigation.js"></script>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -44,7 +45,9 @@
     <form id="studentForm" novalidate>
 
 
-        <!-- ================= PERSONAL ================= -->
+        <!-- =====================================================
+             1. PERSONAL DETAILS
+        ====================================================== -->
 
         <div class="card">
 
@@ -52,42 +55,72 @@
 
             <div class="form-grid">
 
+                <!-- Register Number -->
+
                 <div class="form-group">
-                    <label>Register Number *</label>
+
+                    <label for="registerNumber">
+                        Register Number / Roll Number *
+                    </label>
 
                     <input
                         type="text"
                         id="registerNumber"
+                        name="registerNumber"
                         placeholder="Example: 24BCS034"
-                        required>
+                        autocomplete="off"
+                        required
+                    >
+
                 </div>
 
 
+                <!-- Name -->
+
                 <div class="form-group">
-                    <label>Full Name *</label>
+
+                    <label for="name">
+                        Full Name *
+                    </label>
 
                     <input
                         type="text"
                         id="name"
+                        name="name"
                         placeholder="Enter your full name"
-                        required>
+                        required
+                    >
+
                 </div>
 
 
+                <!-- DOB -->
+
                 <div class="form-group">
-                    <label>Date of Birth *</label>
+
+                    <label for="dob">
+                        Date of Birth *
+                    </label>
 
                     <input
                         type="date"
                         id="dob"
-                        required>
+                        name="dob"
+                        required
+                    >
+
                 </div>
 
 
-                <div class="form-group">
-                    <label>Gender *</label>
+                <!-- Gender -->
 
-                    <select id="gender" required>
+                <div class="form-group">
+
+                    <label for="gender">
+                        Gender *
+                    </label>
+
+                    <select id="gender" name="gender" required>
 
                         <option value="">
                             Select Gender
@@ -106,13 +139,19 @@
                         </option>
 
                     </select>
+
                 </div>
 
 
-                <div class="form-group">
-                    <label>Department *</label>
+                <!-- Department -->
 
-                    <select id="department" required>
+                <div class="form-group">
+
+                    <label for="department">
+                        Department *
+                    </label>
+
+                    <select id="department" name="department" required>
 
                         <option value="">
                             Select Department
@@ -139,13 +178,19 @@
                         </option>
 
                     </select>
+
                 </div>
 
 
-                <div class="form-group">
-                    <label>Section *</label>
+                <!-- Section -->
 
-                    <select id="section" required>
+                <div class="form-group">
+
+                    <label for="section">
+                        Section *
+                    </label>
+
+                    <select id="section" name="section" required>
 
                         <option value="">
                             Select Section
@@ -164,45 +209,75 @@
                         </option>
 
                     </select>
+
                 </div>
 
 
+                <!-- College Email -->
+
                 <div class="form-group">
-                    <label>College Email *</label>
+
+                    <label for="collegeEmail">
+                        College Email *
+                    </label>
 
                     <input
                         type="email"
                         id="collegeEmail"
+                        name="collegeEmail"
                         placeholder="example@kct.ac.in"
-                        required>
+                        required
+                    >
+
                 </div>
 
 
+                <!-- Personal Email -->
+
                 <div class="form-group">
-                    <label>Personal Email</label>
+
+                    <label for="personalEmail">
+                        Personal Email
+                    </label>
 
                     <input
                         type="email"
                         id="personalEmail"
-                        placeholder="Enter personal email">
+                        name="personalEmail"
+                        placeholder="Enter personal email"
+                    >
+
                 </div>
 
 
+                <!-- Mobile -->
+
                 <div class="form-group">
-                    <label>Mobile Number *</label>
+
+                    <label for="mobile">
+                        Mobile Number *
+                    </label>
 
                     <input
                         type="tel"
                         id="mobile"
+                        name="mobile"
                         placeholder="10 digit mobile number"
-                        required>
+                        required
+                    >
+
                 </div>
 
 
-                <div class="form-group">
-                    <label>Category *</label>
+                <!-- Category -->
 
-                    <select id="category" required>
+                <div class="form-group">
+
+                    <label for="category">
+                        Category *
+                    </label>
+
+                    <select id="category" name="category" required>
 
                         <option value="">
                             Select Category
@@ -229,26 +304,41 @@
                         </option>
 
                     </select>
+
                 </div>
 
+
+                <!-- Address -->
 
                 <div class="form-group full">
 
-                    <label>Address *</label>
+                    <label for="address">
+                        Address *
+                    </label>
 
                     <textarea
                         id="address"
+                        name="address"
                         placeholder="Enter your address"
-                        required></textarea>
+                        required
+                    ></textarea>
 
                 </div>
 
 
+                <!-- Student Type -->
+
                 <div class="form-group">
 
-                    <label>Student Type *</label>
+                    <label for="studentType">
+                        Student Type *
+                    </label>
 
-                    <select id="studentType" required>
+                    <select
+                        id="studentType"
+                        name="studentType"
+                        required
+                    >
 
                         <option value="">
                             Select Student Type
@@ -267,48 +357,70 @@
                 </div>
 
 
+                <!-- Hostel Name -->
+
                 <div
                     class="form-group"
                     id="hostelFields"
-                    style="display:none;">
+                    style="display:none;"
+                >
 
-                    <label>Hostel Name</label>
+                    <label for="hostelName">
+                        Hostel Name
+                    </label>
 
                     <input
                         type="text"
                         id="hostelName"
-                        placeholder="Hostel name">
+                        name="hostelName"
+                        placeholder="Hostel name"
+                    >
 
                 </div>
 
+
+                <!-- Hostel Room -->
 
                 <div
                     class="form-group"
                     id="hostelRoomField"
-                    style="display:none;">
+                    style="display:none;"
+                >
 
-                    <label>Hostel Room</label>
+                    <label for="hostelRoom">
+                        Hostel Room
+                    </label>
 
                     <input
                         type="text"
                         id="hostelRoom"
-                        placeholder="Room number">
+                        name="hostelRoom"
+                        placeholder="Room number"
+                    >
 
                 </div>
 
 
+                <!-- Distance -->
+
                 <div
                     class="form-group"
                     id="dayScholarFields"
-                    style="display:none;">
+                    style="display:none;"
+                >
 
-                    <label>Distance From College (KM)</label>
+                    <label for="distanceFromCollege">
+                        Distance From College (KM)
+                    </label>
 
                     <input
                         type="number"
                         id="distanceFromCollege"
+                        name="distanceFromCollege"
                         min="0"
-                        step="0.1">
+                        step="0.1"
+                        placeholder="Example: 12.5"
+                    >
 
                 </div>
 
@@ -317,7 +429,9 @@
         </div>
 
 
-        <!-- ================= FAMILY ================= -->
+        <!-- =====================================================
+             2. FAMILY DETAILS
+        ====================================================== -->
 
         <div class="card">
 
@@ -327,56 +441,94 @@
 
                 <div class="form-group">
 
-                    <label>Father Name</label>
+                    <label for="fatherName">
+                        Father Name
+                    </label>
 
                     <input
                         type="text"
-                        id="fatherName">
+                        id="fatherName"
+                        name="fatherName"
+                    >
 
                 </div>
 
 
                 <div class="form-group">
 
-                    <label>Mother Name</label>
+                    <label for="motherName">
+                        Mother Name
+                    </label>
 
                     <input
                         type="text"
-                        id="motherName">
+                        id="motherName"
+                        name="motherName"
+                    >
 
                 </div>
 
 
                 <div class="form-group">
 
-                    <label>Father Occupation</label>
+                    <label for="fatherOccupation">
+                        Father Occupation
+                    </label>
 
                     <input
                         type="text"
-                        id="fatherOccupation">
+                        id="fatherOccupation"
+                        name="fatherOccupation"
+                    >
 
                 </div>
 
 
                 <div class="form-group">
 
-                    <label>Mother Occupation</label>
+                    <label for="motherOccupation">
+                        Mother Occupation
+                    </label>
 
                     <input
                         type="text"
-                        id="motherOccupation">
+                        id="motherOccupation"
+                        name="motherOccupation"
+                    >
 
                 </div>
 
 
                 <div class="form-group">
 
-                    <label>Family Income</label>
+                    <label for="familyIncome">
+                        Family Income
+                    </label>
 
                     <input
                         type="number"
                         id="familyIncome"
-                        min="0">
+                        name="familyIncome"
+                        min="0"
+                        placeholder="Annual family income"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="siblings">
+                        Number of Siblings
+                    </label>
+
+                    <input
+                        type="number"
+                        id="siblings"
+                        name="siblings"
+                        min="0"
+                        placeholder="Example: 1"
+                    >
 
                 </div>
 
@@ -385,15 +537,19 @@
         </div>
 
 
-        <!-- ================= ACADEMIC ================= -->
+        <!-- =====================================================
+             3. ACADEMIC DETAILS
+        ====================================================== -->
 
         <div class="card">
 
             <h2>3. Academic Details</h2>
 
             <p>
-                Semester percentage and arrear details can be entered here.
-                <strong>CGPA is entered only by Faculty.</strong>
+                Enter semester percentage and arrear information here.
+                <strong>
+                    CGPA is entered and managed only by Faculty.
+                </strong>
             </p>
 
             <div id="semesterContainer"></div>
@@ -403,10 +559,9 @@
                 <button
                     type="button"
                     class="btn btn-secondary"
-                    id="addSemesterBtn">
-
+                    id="addSemesterBtn"
+                >
                     + Add Semester
-
                 </button>
 
             </div>
@@ -414,7 +569,9 @@
         </div>
 
 
-        <!-- ================= ARREARS ================= -->
+        <!-- =====================================================
+             4. ARREARS
+        ====================================================== -->
 
         <div class="card">
 
@@ -422,9 +579,14 @@
 
             <div class="form-group">
 
-                <label>Do you have arrears?</label>
+                <label for="hasArrears">
+                    Do you have arrears?
+                </label>
 
-                <select id="hasArrears">
+                <select
+                    id="hasArrears"
+                    name="hasArrears"
+                >
 
                     <option value="false">
                         No
@@ -441,7 +603,8 @@
 
             <div
                 id="arrearSection"
-                style="display:none;">
+                style="display:none;"
+            >
 
                 <div id="arrearContainer"></div>
 
@@ -450,10 +613,9 @@
                     <button
                         type="button"
                         class="btn btn-secondary"
-                        id="addArrearBtn">
-
+                        id="addArrearBtn"
+                    >
                         + Add Arrear
-
                     </button>
 
                 </div>
@@ -463,7 +625,9 @@
         </div>
 
 
-        <!-- ================= TECHNICAL ================= -->
+        <!-- =====================================================
+             5. TECHNICAL PROFILE
+        ====================================================== -->
 
         <div class="card">
 
@@ -473,46 +637,92 @@
 
                 <div class="form-group">
 
-                    <label>Programming Languages</label>
+                    <label for="programmingLanguages">
+                        Programming Languages
+                    </label>
 
                     <input
                         type="text"
                         id="programmingLanguages"
-                        placeholder="Java, Python, C...">
+                        name="programmingLanguages"
+                        placeholder="Java, Python, C, JavaScript..."
+                    >
 
                 </div>
 
 
                 <div class="form-group">
 
-                    <label>Technical Skills</label>
+                    <label for="technicalSkills">
+                        Technical Skills
+                    </label>
 
                     <input
                         type="text"
                         id="technicalSkills"
-                        placeholder="Web, Database, Cloud...">
+                        name="technicalSkills"
+                        placeholder="Web Development, Database, Cloud..."
+                    >
 
                 </div>
 
 
                 <div class="form-group full">
 
-                    <label>Projects</label>
-
-                    <textarea
-                        id="projects"
-                        placeholder="Describe your projects"></textarea>
-
-                </div>
-
-
-                <div class="form-group full">
-
-                    <label>Certifications</label>
+                    <label for="certifications">
+                        Certifications
+                    </label>
 
                     <textarea
                         id="certifications"
-                        placeholder="Enter certifications"></textarea>
+                        name="certifications"
+                        placeholder="Enter your certifications"
+                    ></textarea>
+
+                </div>
+
+
+                <div class="form-group full">
+
+                    <label for="projects">
+                        Projects
+                    </label>
+
+                    <textarea
+                        id="projects"
+                        name="projects"
+                        placeholder="Describe your projects"
+                    ></textarea>
+
+                </div>
+
+
+                <div class="form-group full">
+
+                    <label for="internships">
+                        Internships
+                    </label>
+
+                    <textarea
+                        id="internships"
+                        name="internships"
+                        placeholder="Enter internship details"
+                    ></textarea>
+
+                </div>
+
+
+                <div class="form-group full">
+
+                    <label for="achievements">
+                        Achievements
+                    </label>
+
+                    <textarea
+                        id="achievements"
+                        name="achievements"
+                        placeholder="Enter your achievements"
+                    ></textarea>
 
                 </div>
 
@@ -521,7 +731,9 @@
         </div>
 
 
-        <!-- ================= SELF EVALUATION ================= -->
+        <!-- =====================================================
+             6. SELF EVALUATION
+        ====================================================== -->
 
         <div class="card">
 
@@ -531,36 +743,156 @@
 
                 <div class="form-group">
 
-                    <label>Strengths</label>
+                    <label for="strengths">
+                        Strengths
+                    </label>
 
-                    <textarea id="strengths"></textarea>
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>Weaknesses</label>
-
-                    <textarea id="weaknesses"></textarea>
+                    <textarea
+                        id="strengths"
+                        name="strengths"
+                        placeholder="What are your strengths?"
+                    ></textarea>
 
                 </div>
 
 
                 <div class="form-group">
 
-                    <label>Interests</label>
+                    <label for="weaknesses">
+                        Weaknesses
+                    </label>
 
-                    <textarea id="interests"></textarea>
+                    <textarea
+                        id="weaknesses"
+                        name="weaknesses"
+                        placeholder="What are your weaknesses?"
+                    ></textarea>
 
                 </div>
 
 
                 <div class="form-group">
 
-                    <label>Areas to Improve</label>
+                    <label for="interests">
+                        Interests
+                    </label>
 
-                    <textarea id="areasToImprove"></textarea>
+                    <textarea
+                        id="interests"
+                        name="interests"
+                        placeholder="Enter your interests"
+                    ></textarea>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="hobbies">
+                        Hobbies
+                    </label>
+
+                    <textarea
+                        id="hobbies"
+                        name="hobbies"
+                        placeholder="Enter your hobbies"
+                    ></textarea>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="communicationSkills">
+                        Communication Skills
+                    </label>
+
+                    <select
+                        id="communicationSkills"
+                        name="communicationSkills"
+                    >
+
+                        <option value="">
+                            Select Level
+                        </option>
+
+                        <option value="Beginner">
+                            Beginner
+                        </option>
+
+                        <option value="Intermediate">
+                            Intermediate
+                        </option>
+
+                        <option value="Advanced">
+                            Advanced
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="leadershipSkills">
+                        Leadership Skills
+                    </label>
+
+                    <select
+                        id="leadershipSkills"
+                        name="leadershipSkills"
+                    >
+
+                        <option value="">
+                            Select Level
+                        </option>
+
+                        <option value="Beginner">
+                            Beginner
+                        </option>
+
+                        <option value="Intermediate">
+                            Intermediate
+                        </option>
+
+                        <option value="Advanced">
+                            Advanced
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="teamworkSkills">
+                        Teamwork Skills
+                    </label>
+
+                    <select
+                        id="teamworkSkills"
+                        name="teamworkSkills"
+                    >
+
+                        <option value="">
+                            Select Level
+                        </option>
+
+                        <option value="Beginner">
+                            Beginner
+                        </option>
+
+                        <option value="Intermediate">
+                            Intermediate
+                        </option>
+
+                        <option value="Advanced">
+                            Advanced
+                        </option>
+
+                    </select>
 
                 </div>
 
@@ -569,7 +901,9 @@
         </div>
 
 
-        <!-- ================= CAREER ================= -->
+        <!-- =====================================================
+             7. CAREER GOAL
+        ====================================================== -->
 
         <div class="card">
 
@@ -577,9 +911,15 @@
 
             <div class="form-group">
 
-                <label>Select Career Goal *</label>
+                <label for="careerGoal">
+                    Select Career Goal *
+                </label>
 
-                <select id="careerGoal" required>
+                <select
+                    id="careerGoal"
+                    name="careerGoal"
+                    required
+                >
 
                     <option value="">
                         Select Career Goal
@@ -602,8 +942,12 @@
             </div>
 
 
-            <div id="placementFields"
-                 style="display:none;">
+            <!-- PLACEMENT -->
+
+            <div
+                id="placementFields"
+                style="display:none;"
+            >
 
                 <h3>Placement Details</h3>
 
@@ -611,32 +955,64 @@
 
                     <div class="form-group">
 
-                        <label>Target Company</label>
+                        <label for="preferredRole">
+                            Preferred Role
+                        </label>
 
                         <input
                             type="text"
-                            id="targetCompany">
+                            id="preferredRole"
+                            name="preferredRole"
+                            placeholder="Example: Software Developer"
+                        >
 
                     </div>
 
 
                     <div class="form-group">
 
-                        <label>Target Role</label>
+                        <label for="preferredCompany">
+                            Preferred Company
+                        </label>
 
                         <input
                             type="text"
-                            id="targetRole">
+                            id="preferredCompany"
+                            name="preferredCompany"
+                            placeholder="Example: TCS, Infosys..."
+                        >
 
                     </div>
 
 
-                    <div class="form-group full">
+                    <div class="form-group">
 
-                        <label>Preparation Status</label>
+                        <label for="preferredLocation">
+                            Preferred Location
+                        </label>
 
-                        <textarea
-                            id="preparationStatus"></textarea>
+                        <input
+                            type="text"
+                            id="preferredLocation"
+                            name="preferredLocation"
+                            placeholder="Example: Chennai"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="expectedPackage">
+                            Expected Package
+                        </label>
+
+                        <input
+                            type="text"
+                            id="expectedPackage"
+                            name="expectedPackage"
+                            placeholder="Example: 6 LPA"
+                        >
 
                     </div>
 
@@ -645,8 +1021,12 @@
             </div>
 
 
-            <div id="higherStudiesFields"
-                 style="display:none;">
+            <!-- HIGHER STUDIES -->
+
+            <div
+                id="higherStudiesFields"
+                style="display:none;"
+            >
 
                 <h3>Higher Studies Details</h3>
 
@@ -654,44 +1034,64 @@
 
                     <div class="form-group">
 
-                        <label>Degree</label>
+                        <label for="preferredCourse">
+                            Preferred Course
+                        </label>
 
                         <input
                             type="text"
-                            id="higherDegree">
+                            id="preferredCourse"
+                            name="preferredCourse"
+                            placeholder="Example: M.Tech / MS / MBA"
+                        >
 
                     </div>
 
 
                     <div class="form-group">
 
-                        <label>Country</label>
+                        <label for="preferredUniversity">
+                            Preferred University
+                        </label>
 
                         <input
                             type="text"
-                            id="higherCountry">
+                            id="preferredUniversity"
+                            name="preferredUniversity"
+                            placeholder="Enter university name"
+                        >
 
                     </div>
 
 
                     <div class="form-group">
 
-                        <label>University</label>
+                        <label for="preferredCountry">
+                            Preferred Country
+                        </label>
 
                         <input
                             type="text"
-                            id="higherUniversity">
+                            id="preferredCountry"
+                            name="preferredCountry"
+                            placeholder="Example: USA / Germany / India"
+                        >
 
                     </div>
 
 
                     <div class="form-group">
 
-                        <label>Entrance Exam</label>
+                        <label for="entranceExam">
+                            Entrance Exam
+                        </label>
 
                         <input
                             type="text"
-                            id="entranceExam">
+                            id="entranceExam"
+                            name="entranceExam"
+                            placeholder="Example: GATE / GRE / IELTS"
+                        >
 
                     </div>
 
@@ -700,8 +1100,12 @@
             </div>
 
 
-            <div id="entrepreneurshipFields"
-                 style="display:none;">
+            <!-- ENTREPRENEURSHIP -->
+
+            <div
+                id="entrepreneurshipFields"
+                style="display:none;"
+            >
 
                 <h3>Entrepreneurship Details</h3>
 
@@ -709,45 +1113,60 @@
 
                     <div class="form-group">
 
-                        <label>Business Idea</label>
+                        <label for="businessIdea">
+                            Business Idea
+                        </label>
 
                         <input
                             type="text"
-                            id="businessIdea">
+                            id="businessIdea"
+                            name="businessIdea"
+                            placeholder="Enter your business idea"
+                        >
 
                     </div>
 
 
                     <div class="form-group">
 
-                        <label>Business Domain</label>
+                        <label for="businessDomain">
+                            Business Domain
+                        </label>
 
                         <input
                             type="text"
-                            id="businessDomain">
+                            id="businessDomain"
+                            name="businessDomain"
+                            placeholder="Example: Technology / Agriculture"
+                        >
 
                     </div>
 
 
                     <div class="form-group">
 
-                        <label>Funding Required</label>
+                        <label for="startupInterest">
+                            Startup Interest
+                        </label>
 
-                        <input
-                            type="text"
-                            id="fundingRequired">
+                        <select
+                            id="startupInterest"
+                            name="startupInterest"
+                        >
 
-                    </div>
+                            <option value="">
+                                Select
+                            </option>
 
+                            <option value="Yes">
+                                Yes
+                            </option>
 
-                    <div class="form-group">
+                            <option value="No">
+                                No
+                            </option>
 
-                        <label>Team Size</label>
-
-                        <input
-                            type="number"
-                            id="teamSize"
-                            min="1">
+                        </select>
 
                     </div>
 
@@ -758,25 +1177,25 @@
         </div>
 
 
-        <!-- ================= BUTTONS ================= -->
+        <!-- =====================================================
+             BUTTONS
+        ====================================================== -->
 
         <div class="button-container">
 
             <button
                 type="submit"
-                class="btn btn-primary">
-
+                class="btn btn-primary"
+            >
                 Save Profile
-
             </button>
 
 
             <button
                 type="reset"
-                class="btn btn-secondary">
-
+                class="btn btn-secondary"
+            >
                 Reset
-
             </button>
 
         </div>

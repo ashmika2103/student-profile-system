@@ -3,49 +3,49 @@ const router = express.Router();
 
 const User = require("../models/User");
 
-
-/* =========================
-   LOGIN
-========================= */
+// ============================================================
+// STUDENT / FACULTY LOGIN
+// ============================================================
 
 router.post("/login", async (req, res) => {
     try {
-        const {
-            loginId,
-            password,
-            role
-        } = req.body;
+        const { loginId, password, role } = req.body;
 
+        // Check empty fields
         if (!loginId || !password || !role) {
             return res.status(400).json({
                 success: false,
-                message: "Login ID, password and role are required"
+                message: "Please enter Login ID, Password and Role."
             });
         }
 
+        const cleanLoginId = loginId.trim();
+
+        // Find user by Login ID and Role
         const user = await User.findOne({
-            loginId: loginId.trim(),
+            loginId: cleanLoginId,
             role: role
         });
 
         if (!user) {
             return res.status(401).json({
                 success: false,
-                message: "Invalid login credentials"
+                message: "Invalid login credentials."
             });
         }
 
+        // Check password
         if (user.password !== password) {
             return res.status(401).json({
                 success: false,
-                message: "Invalid login credentials"
+                message: "Invalid login credentials."
             });
         }
 
-        res.status(200).json({
+        // Successful login
+        return res.json({
             success: true,
-            message: "Login successful",
-
+            message: "Login successful.",
             user: {
                 id: user._id,
                 loginId: user.loginId,
@@ -56,25 +56,22 @@ router.post("/login", async (req, res) => {
         });
 
     } catch (error) {
-
         console.error("Login error:", error);
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
-            message: "Login failed",
-            error: error.message
+            message: "Server error during login."
         });
     }
 });
 
 
-/* =========================
-   REGISTER USER
-========================= */
+// ============================================================
+// STUDENT REGISTRATION
+// ============================================================
 
 router.post("/register", async (req, res) => {
     try {
-
         const {
             loginId,
             password,
@@ -83,55 +80,79 @@ router.post("/register", async (req, res) => {
             name
         } = req.body;
 
-        if (!loginId || !password || !role) {
+        // Check required fields
+        if (
+            !loginId ||
+            !password ||
+            !registerNumber ||
+            !name
+        ) {
             return res.status(400).json({
                 success: false,
-                message: "Login ID, password and role are required"
+                message: "Please fill all required fields."
             });
         }
 
+        // Registration page should create Student accounts only
+        if (role !== "Student") {
+            return res.status(400).json({
+                success: false,
+                message: "Only Student registration is allowed."
+            });
+        }
+
+        const cleanLoginId = loginId.trim();
+        const cleanRegisterNumber = registerNumber.trim();
+        const cleanName = name.trim();
+
+        // Check whether account already exists
         const existingUser = await User.findOne({
-            loginId: loginId.trim()
+            loginId: cleanLoginId
         });
 
         if (existingUser) {
             return res.status(409).json({
                 success: false,
-                message: "User already exists"
+                message: "This Register Number is already registered."
             });
         }
 
-        const user = new User({
-            loginId: loginId.trim(),
-            password,
-            role,
-            registerNumber: registerNumber || "",
-            name: name || ""
+        // Create new student login account
+        const newUser = new User({
+            loginId: cleanLoginId,
+            password: password,
+            role: "Student",
+            registerNumber: cleanRegisterNumber,
+            name: cleanName
         });
 
-        const savedUser = await user.save();
+        await newUser.save();
 
-        res.status(201).json({
+        return res.status(201).json({
             success: true,
-            message: "User created successfully",
-
+            message: "Student account created successfully.",
             user: {
-                id: savedUser._id,
-                loginId: savedUser.loginId,
-                role: savedUser.role,
-                registerNumber: savedUser.registerNumber,
-                name: savedUser.name
+                loginId: newUser.loginId,
+                role: newUser.role,
+                registerNumber: newUser.registerNumber,
+                name: newUser.name
             }
         });
 
     } catch (error) {
+        console.error("Registration error:", error);
 
-        console.error("Register error:", error);
+        // Duplicate register number
+        if (error.code === 11000) {
+            return res.status(409).json({
+                success: false,
+                message: "This Register Number is already registered."
+            });
+        }
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
-            message: "Failed to create user",
-            error: error.message
+            message: "Server error during registration."
         });
     }
 });

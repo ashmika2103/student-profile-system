@@ -1,151 +1,411 @@
-const API_URL = "http://localhost:5000/api";
+// ============================================================
+// STUDENT REGISTRATION
+// ============================================================
 
-document.addEventListener("DOMContentLoaded", () => {
+const REGISTER_API_URL = "/api";
 
-    const form = document.getElementById("studentRegisterForm");
 
-    if (!form) {
+// ============================================================
+// GET ELEMENTS
+// ============================================================
+
+const registerForm = document.getElementById("registerForm");
+
+const registerNumber = document.getElementById("registerNumber");
+
+const studentName = document.getElementById("studentName");
+
+const collegeEmail = document.getElementById("collegeEmail");
+
+const password = document.getElementById("password");
+
+const confirmPassword = document.getElementById("confirmPassword");
+
+const registerMessage = document.getElementById("registerMessage");
+
+
+// ============================================================
+// SHOW MESSAGE
+// ============================================================
+
+function showRegisterMessage(message, type) {
+
+    if (!registerMessage) {
         return;
     }
 
-    form.addEventListener("submit", async (event) => {
+    registerMessage.textContent = message;
 
-        event.preventDefault();
-
-        const registerNumber =
-            document.getElementById("registerNumber").value.trim();
-
-        const studentName =
-            document.getElementById("studentName").value.trim();
-
-        const collegeEmail =
-            document.getElementById("collegeEmail").value.trim();
-
-        const password =
-            document.getElementById("registerPassword").value;
-
-        const confirmPassword =
-            document.getElementById("confirmPassword").value;
-
-        const message =
-            document.getElementById("registerMessage");
+    if (type === "success") {
+        registerMessage.style.color = "green";
+    } else {
+        registerMessage.style.color = "red";
+    }
+}
 
 
-        // Clear previous message
-        message.className = "register-message";
-        message.textContent = "";
+// ============================================================
+// PASSWORD SHOW / HIDE
+// ============================================================
 
+function addPasswordToggle(input) {
 
-        // Empty field validation
-        if (
-            !registerNumber ||
-            !studentName ||
-            !collegeEmail ||
-            !password ||
-            !confirmPassword
-        ) {
-            message.className = "register-message error";
-            message.textContent = "Please fill in all fields.";
-            return;
+    if (!input) {
+        return;
+    }
+
+    const parent = input.parentElement;
+
+    if (!parent) {
+        return;
+    }
+
+    // Make the input container relative
+    parent.style.position = "relative";
+
+    const toggleButton = document.createElement("button");
+
+    toggleButton.type = "button";
+
+    toggleButton.textContent = "Show";
+
+    toggleButton.style.position = "absolute";
+    toggleButton.style.right = "10px";
+    toggleButton.style.top = "50%";
+    toggleButton.style.transform = "translateY(-50%)";
+
+    toggleButton.style.background = "transparent";
+    toggleButton.style.border = "none";
+    toggleButton.style.padding = "4px 8px";
+
+    toggleButton.style.cursor = "pointer";
+
+    toggleButton.style.fontFamily =
+        '"Times New Roman", serif';
+
+    toggleButton.style.fontSize = "14px";
+
+    toggleButton.style.color = "#1d4ed8";
+
+    // Prevent button from submitting the form
+    toggleButton.addEventListener("click", function () {
+
+        if (input.type === "password") {
+
+            input.type = "text";
+
+            toggleButton.textContent = "Hide";
+
+        } else {
+
+            input.type = "password";
+
+            toggleButton.textContent = "Show";
         }
 
+    });
 
-        // Password length validation
-        if (password.length < 6) {
-            message.className = "register-message error";
-            message.textContent =
-                "Password must contain at least 6 characters.";
-            return;
-        }
+    parent.appendChild(toggleButton);
+}
 
 
-        // Password match validation
-        if (password !== confirmPassword) {
-            message.className = "register-message error";
-            message.textContent =
-                "Passwords do not match.";
-            return;
-        }
+// Add separate buttons to BOTH fields
+addPasswordToggle(password);
+
+addPasswordToggle(confirmPassword);
 
 
-        // Email validation
-        if (!collegeEmail.includes("@")) {
-            message.className = "register-message error";
-            message.textContent =
-                "Please enter a valid college email.";
-            return;
-        }
+// ============================================================
+// REGISTRATION
+// ============================================================
+
+if (registerForm) {
+
+    registerForm.addEventListener(
+        "submit",
+        async function (event) {
+
+            event.preventDefault();
+
+            showRegisterMessage("", "error");
 
 
-        try {
+            // ------------------------------------------------
+            // GET VALUES
+            // ------------------------------------------------
 
-            const response = await fetch(
-                `${API_URL}/auth/register`,
-                {
-                    method: "POST",
+            const registerNumberValue =
+                registerNumber.value.trim();
 
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+            const studentNameValue =
+                studentName.value.trim();
 
-                    body: JSON.stringify({
-                        loginId: registerNumber,
-                        password: password,
-                        role: "Student",
-                        registerNumber: registerNumber,
-                        name: studentName
-                    })
-                }
-            );
+            const collegeEmailValue =
+                collegeEmail.value.trim();
+
+            const passwordValue =
+                password.value;
+
+            const confirmPasswordValue =
+                confirmPassword.value;
 
 
-            const data = await response.json();
+            // ------------------------------------------------
+            // CHECK EMPTY FIELDS
+            // ------------------------------------------------
 
+            if (
+                !registerNumberValue ||
+                !studentNameValue ||
+                !collegeEmailValue ||
+                !passwordValue ||
+                !confirmPasswordValue
+            ) {
 
-            if (!response.ok) {
-
-                message.className =
-                    "register-message error";
-
-                message.textContent =
-                    data.message || "Registration failed.";
+                showRegisterMessage(
+                    "Please fill all fields.",
+                    "error"
+                );
 
                 return;
             }
 
 
-            // Registration successful
-            message.className =
-                "register-message success";
+            // ------------------------------------------------
+            // REGISTER NUMBER VALIDATION
+            // ------------------------------------------------
 
-            message.textContent =
-                "Registration successful! Redirecting to login...";
+            const registerPattern =
+                /^[A-Za-z0-9]+$/;
+
+            if (
+                !registerPattern.test(
+                    registerNumberValue
+                )
+            ) {
+
+                showRegisterMessage(
+                    "Enter a valid Register Number.",
+                    "error"
+                );
+
+                return;
+            }
 
 
-            form.reset();
+            // ------------------------------------------------
+            // NAME VALIDATION
+            // ------------------------------------------------
+
+            const namePattern =
+                /^[A-Za-z ]+$/;
+
+            if (
+                !namePattern.test(
+                    studentNameValue
+                )
+            ) {
+
+                showRegisterMessage(
+                    "Student name should contain only letters.",
+                    "error"
+                );
+
+                return;
+            }
 
 
-            setTimeout(() => {
+            // ------------------------------------------------
+            // EMAIL VALIDATION
+            // ------------------------------------------------
 
-                window.location.href = "index.html";
+            const emailPattern =
+                /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-            }, 1500);
+            if (
+                !emailPattern.test(
+                    collegeEmailValue
+                )
+            ) {
+
+                showRegisterMessage(
+                    "Enter a valid college email.",
+                    "error"
+                );
+
+                return;
+            }
 
 
-        } catch (error) {
+            // ------------------------------------------------
+            // PASSWORD LENGTH
+            // ------------------------------------------------
 
-            console.error(
-                "Registration error:",
-                error
-            );
+            if (passwordValue.length < 6) {
 
-            message.className =
-                "register-message error";
+                showRegisterMessage(
+                    "Password must contain at least 6 characters.",
+                    "error"
+                );
 
-            message.textContent =
-                "Cannot connect to the server. Please make sure the backend is running.";
+                return;
+            }
+
+
+            // ------------------------------------------------
+            // PASSWORD MATCH
+            // ------------------------------------------------
+
+            if (
+                passwordValue !==
+                confirmPasswordValue
+            ) {
+
+                showRegisterMessage(
+                    "Passwords do not match.",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            // ------------------------------------------------
+            // SUBMIT BUTTON
+            // ------------------------------------------------
+
+            const submitButton =
+                registerForm.querySelector(
+                    "button[type='submit']"
+                );
+
+            if (submitButton) {
+
+                submitButton.disabled = true;
+
+                submitButton.textContent =
+                    "Creating Account...";
+            }
+
+
+            // ------------------------------------------------
+            // SEND REGISTRATION REQUEST
+            // ------------------------------------------------
+
+            try {
+
+                const response =
+                    await fetch(
+                        `${REGISTER_API_URL}/auth/register`,
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body: JSON.stringify({
+
+                                loginId:
+                                    registerNumberValue,
+
+                                password:
+                                    passwordValue,
+
+                                role:
+                                    "Student",
+
+                                registerNumber:
+                                    registerNumberValue,
+
+                                name:
+                                    studentNameValue
+                            })
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                console.log(
+                    "Registration response:",
+                    data
+                );
+
+
+                // ------------------------------------------------
+                // CHECK RESPONSE
+                // ------------------------------------------------
+
+                if (
+                    !response.ok ||
+                    !data.success
+                ) {
+
+                    throw new Error(
+                        data.message ||
+                        "Registration failed."
+                    );
+                }
+
+
+                // ------------------------------------------------
+                // SUCCESS
+                // ------------------------------------------------
+
+                showRegisterMessage(
+                    "Registration successful! You can now login.",
+                    "success"
+                );
+
+
+                // Clear password fields
+
+                password.value = "";
+
+                confirmPassword.value = "";
+
+
+                // Go to login page
+
+                setTimeout(
+                    function () {
+
+                        window.location.href =
+                            "index.html";
+
+                    },
+                    1500
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Registration error:",
+                    error
+                );
+
+                showRegisterMessage(
+                    error.message ||
+                    "Registration failed.",
+                    "error"
+                );
+
+
+            } finally {
+
+                if (submitButton) {
+
+                    submitButton.disabled = false;
+
+                    submitButton.textContent =
+                        "Create Account";
+                }
+            }
         }
-
-    });
-
-});
+    );
+}

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-
+<script src="js/navigation.js"></script>
 <head>
 
     <meta charset="UTF-8">
@@ -8,7 +8,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>Add Student - Faculty</title>
+    <title>Update Student - Faculty</title>
 
     <link rel="stylesheet"
           href="css/style.css">
@@ -17,6 +17,7 @@
 
 
 <body>
+
 
 <header>
 
@@ -33,11 +34,11 @@
         </a>
 
         <a href="add-student.html">
-            Add Student
+            Update CGPA
         </a>
 
         <a href="#"
-           onclick="logout()">
+           onclick="logout(); return false;">
             Logout
         </a>
 
@@ -46,148 +47,378 @@
 </header>
 
 
+
 <div class="container">
+
 
     <div class="page-title">
 
-        <h1>Faculty - Student Academic Update</h1>
+        <h1>
+            Update Student Information
+        </h1>
 
         <p>
-            Faculty can enter and update student CGPA.
+            Faculty can update CGPA and mentor information.
         </p>
 
     </div>
 
 
-    <div id="facultyMessage"></div>
 
+    <!-- ================================================= -->
+    <!-- SEARCH STUDENT -->
+    <!-- ================================================= -->
 
     <div class="card">
 
-        <h2>Student Academic Information</h2>
-
-        <form id="facultyStudentForm"
-              novalidate>
-
-            <div class="form-grid">
-
-                <div class="form-group">
-
-                    <label>
-                        Register Number *
-                    </label>
-
-                    <input
-                        type="text"
-                        id="facultyRegisterNumber"
-                        placeholder="Example: 24BCS034"
-                        required>
-
-                </div>
+        <h2>
+            1. Find Student
+        </h2>
 
 
-                <div class="form-group">
-
-                    <label>
-                        Student Name *
-                    </label>
-
-                    <input
-                        type="text"
-                        id="facultyStudentName"
-                        placeholder="Student name"
-                        required>
-
-                </div>
+        <div class="form-grid">
 
 
-                <!-- IMPORTANT CGPA FIELD -->
+            <div class="form-group">
 
-                <div class="form-group">
+                <label for="facultyRegisterNumber">
 
-                    <label>
-                        CGPA *
-                    </label>
+                    Register Number *
 
-                    <input
-                        type="number"
-                        id="facultyCgpa"
-                        placeholder="Example: 8.50"
-                        min="0"
-                        max="10"
-                        step="0.01"
-                        required>
-
-                </div>
+                </label>
 
 
-                <div class="form-group">
-
-                    <label>
-                        Mentor Remarks
-                    </label>
-
-                    <input
-                        type="text"
-                        id="mentorRemarks"
-                        placeholder="Enter remarks">
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>
-                        Mentor Status
-                    </label>
-
-                    <select id="mentorStatus">
-
-                        <option value="Pending">
-                            Pending
-                        </option>
-
-                        <option value="In Progress">
-                            In Progress
-                        </option>
-
-                        <option value="Completed">
-                            Completed
-                        </option>
-
-                    </select>
-
-                </div>
+                <input
+                    type="text"
+                    id="facultyRegisterNumber"
+                    placeholder="Example: 24BCS034"
+                    autocomplete="off"
+                    required
+                >
 
             </div>
 
 
+
+            <div class="form-group">
+
+                <label for="facultyStudentName">
+
+                    Student Name
+
+                </label>
+
+
+                <input
+                    type="text"
+                    id="facultyStudentName"
+                    placeholder="Student name"
+                >
+
+            </div>
+
+
+        </div>
+
+
+
+        <div class="button-container">
+
+            <button
+                type="button"
+                id="findStudentBtn"
+                class="btn btn-primary">
+
+                Find Student
+
+            </button>
+
+
+            <button
+                type="button"
+                id="clearStudentBtn"
+                class="btn btn-secondary">
+
+                Clear
+
+            </button>
+
+        </div>
+
+
+        <div id="searchMessage"
+             class="message-area">
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ================================================= -->
+    <!-- STUDENT DETAILS -->
+    <!-- ================================================= -->
+
+    <div class="card"
+         id="studentDetailsCard"
+         style="display: none;">
+
+        <h2>
+            2. Student Details
+        </h2>
+
+
+        <div class="form-grid">
+
+
+            <div class="form-group">
+
+                <label>
+                    Register Number
+                </label>
+
+
+                <input
+                    type="text"
+                    id="displayRegisterNumber"
+                    readonly
+                >
+
+            </div>
+
+
+
+            <div class="form-group">
+
+                <label>
+                    Student Name
+                </label>
+
+
+                <input
+                    type="text"
+                    id="displayStudentName"
+                    readonly
+                >
+
+            </div>
+
+
+
+            <div class="form-group">
+
+                <label>
+                    Department
+                </label>
+
+
+                <input
+                    type="text"
+                    id="displayDepartment"
+                    readonly
+                >
+
+            </div>
+
+
+
+            <div class="form-group">
+
+                <label>
+                    Section
+                </label>
+
+
+                <input
+                    type="text"
+                    id="displaySection"
+                    readonly
+                >
+
+            </div>
+
+
+
+            <div class="form-group">
+
+                <label>
+                    Career Goal
+                </label>
+
+
+                <input
+                    type="text"
+                    id="displayCareerGoal"
+                    readonly
+                >
+
+            </div>
+
+
+
+            <div class="form-group">
+
+                <label>
+                    Student Type
+                </label>
+
+
+                <input
+                    type="text"
+                    id="displayStudentType"
+                    readonly
+                >
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ================================================= -->
+    <!-- FACULTY UPDATE FORM -->
+    <!-- ================================================= -->
+
+    <div class="card"
+         id="updateCard"
+         style="display: none;">
+
+        <h2>
+            3. Faculty Update
+        </h2>
+
+
+        <form id="facultyForm">
+
+
+            <!-- CGPA -->
+
+            <div class="form-group">
+
+                <label for="facultyCgpa">
+
+                    CGPA *
+
+                </label>
+
+
+                <input
+                    type="number"
+                    id="facultyCgpa"
+                    min="0"
+                    max="10"
+                    step="0.01"
+                    placeholder="Enter CGPA"
+                    required
+                >
+
+
+                <small>
+                    CGPA can only be entered or updated by faculty.
+                </small>
+
+            </div>
+
+
+
+            <!-- MENTOR STATUS -->
+
+            <div class="form-group">
+
+                <label for="mentorStatus">
+
+                    Mentor Status
+
+                </label>
+
+
+                <select id="mentorStatus">
+
+                    <option value="Pending">
+                        Pending
+                    </option>
+
+                    <option value="In Progress">
+                        In Progress
+                    </option>
+
+                    <option value="Completed">
+                        Completed
+                    </option>
+
+                    <option value="Needs Attention">
+                        Needs Attention
+                    </option>
+
+                </select>
+
+            </div>
+
+
+
+            <!-- MENTOR REMARKS -->
+
+            <div class="form-group">
+
+                <label for="mentorRemarks">
+
+                    Mentor Remarks
+
+                </label>
+
+
+                <textarea
+                    id="mentorRemarks"
+                    rows="5"
+                    placeholder="Enter mentor remarks">
+                </textarea>
+
+            </div>
+
+
+
+            <div id="formMessage"
+                 class="message-area">
+
+            </div>
+
+
+
             <div class="button-container">
+
 
                 <button
                     type="submit"
-                    class="btn btn-primary">
+                    class="btn btn-success">
 
-                    Save CGPA
+                    Update Student
 
                 </button>
 
 
                 <button
-                    type="reset"
+                    type="button"
+                    id="resetUpdateBtn"
                     class="btn btn-secondary">
 
                     Reset
 
                 </button>
 
+
             </div>
+
 
         </form>
 
     </div>
 
+
 </div>
+
 
 
 <footer>
@@ -197,7 +428,831 @@
 </footer>
 
 
+
 <script src="js/app.js"></script>
+
+
+
+<script>
+
+
+// ============================================================
+// FACULTY UPDATE PAGE
+// ============================================================
+
+const updateAPI = "/api";
+
+let selectedStudent = null;
+
+
+// ============================================================
+// ELEMENTS
+// ============================================================
+
+const registerNumberInput =
+    document.getElementById(
+        "facultyRegisterNumber"
+    );
+
+const studentNameInput =
+    document.getElementById(
+        "facultyStudentName"
+    );
+
+const findStudentBtn =
+    document.getElementById(
+        "findStudentBtn"
+    );
+
+const clearStudentBtn =
+    document.getElementById(
+        "clearStudentBtn"
+    );
+
+const searchMessage =
+    document.getElementById(
+        "searchMessage"
+    );
+
+const studentDetailsCard =
+    document.getElementById(
+        "studentDetailsCard"
+    );
+
+const updateCard =
+    document.getElementById(
+        "updateCard"
+    );
+
+const facultyForm =
+    document.getElementById(
+        "facultyForm"
+    );
+
+const facultyCgpa =
+    document.getElementById(
+        "facultyCgpa"
+    );
+
+const mentorStatus =
+    document.getElementById(
+        "mentorStatus"
+    );
+
+const mentorRemarks =
+    document.getElementById(
+        "mentorRemarks"
+    );
+
+const formMessage =
+    document.getElementById(
+        "formMessage"
+    );
+
+
+// ============================================================
+// MESSAGE
+// ============================================================
+
+function showSearchMessage(
+    message,
+    type = "success"
+) {
+
+    searchMessage.innerHTML = `
+        <div class="message ${type}">
+            ${message}
+        </div>
+    `;
+
+}
+
+
+function showFormMessage(
+    message,
+    type = "success"
+) {
+
+    formMessage.innerHTML = `
+        <div class="message ${type}">
+            ${message}
+        </div>
+    `;
+
+}
+
+
+// ============================================================
+// FIND STUDENT
+// ============================================================
+
+findStudentBtn.addEventListener(
+    "click",
+    async function () {
+
+        const registerNumber =
+            registerNumberInput.value.trim();
+
+
+        if (!registerNumber) {
+
+            showSearchMessage(
+                "Please enter Register Number.",
+                "error"
+            );
+
+            registerNumberInput.focus();
+
+            return;
+        }
+
+
+        showSearchMessage(
+            "Searching student...",
+            "success"
+        );
+
+
+        try {
+
+            const response =
+                await fetch(
+                    `${updateAPI}/students/register/${encodeURIComponent(
+                        registerNumber
+                    )}`
+                );
+
+
+            const data =
+                await response.json();
+
+
+            console.log(
+                "Find Student Response:",
+                data
+            );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.message ||
+                    "Student not found."
+                );
+            }
+
+
+            const student =
+                data.student ||
+                data.data ||
+                data;
+
+
+            if (
+                !student ||
+                !student._id
+            ) {
+
+                throw new Error(
+                    "Student record was not found."
+                );
+            }
+
+
+            // Save selected student
+
+            selectedStudent =
+                student;
+
+
+            // ------------------------------------------------
+            // BASIC DETAILS
+            // ------------------------------------------------
+
+            studentNameInput.value =
+                student.name || "";
+
+
+            document.getElementById(
+                "displayRegisterNumber"
+            ).value =
+                student.registerNumber || "";
+
+
+            document.getElementById(
+                "displayStudentName"
+            ).value =
+                student.name || "";
+
+
+            document.getElementById(
+                "displayDepartment"
+            ).value =
+                student.department || "";
+
+
+            document.getElementById(
+                "displaySection"
+            ).value =
+                student.section || "";
+
+
+            document.getElementById(
+                "displayCareerGoal"
+            ).value =
+                student.careerGoal || "Not entered";
+
+
+            document.getElementById(
+                "displayStudentType"
+            ).value =
+                student.studentType || "Not entered";
+
+
+            // ------------------------------------------------
+            // CURRENT CGPA
+            // ------------------------------------------------
+
+            if (
+                student.cgpa !== undefined &&
+                student.cgpa !== null &&
+                student.cgpa !== ""
+            ) {
+
+                facultyCgpa.value =
+                    Number(student.cgpa);
+
+            } else {
+
+                facultyCgpa.value = "";
+
+            }
+
+
+            // ------------------------------------------------
+            // CURRENT MENTOR STATUS
+            // ------------------------------------------------
+
+            mentorStatus.value =
+                student.mentorStatus ||
+                "Pending";
+
+
+            // ------------------------------------------------
+            // CURRENT MENTOR REMARKS
+            // ------------------------------------------------
+
+            mentorRemarks.value =
+                student.mentorRemarks ||
+                "";
+
+
+            // ------------------------------------------------
+            // SHOW SECTIONS
+            // ------------------------------------------------
+
+            studentDetailsCard.style.display =
+                "block";
+
+
+            updateCard.style.display =
+                "block";
+
+
+            showSearchMessage(
+                "Student found successfully.",
+                "success"
+            );
+
+
+            formMessage.innerHTML = "";
+
+
+            console.log(
+                "Selected student:",
+                selectedStudent
+            );
+
+        }
+
+
+        catch (error) {
+
+            console.error(
+                "Find student error:",
+                error
+            );
+
+
+            selectedStudent =
+                null;
+
+
+            studentDetailsCard.style.display =
+                "none";
+
+
+            updateCard.style.display =
+                "none";
+
+
+            studentNameInput.value =
+                "";
+
+
+            showSearchMessage(
+                error.message ||
+                "Unable to find student.",
+                "error"
+            );
+
+        }
+
+    }
+);
+
+
+// ============================================================
+// UPDATE STUDENT
+// ============================================================
+
+facultyForm.addEventListener(
+    "submit",
+    async function (event) {
+
+        event.preventDefault();
+
+
+        // ----------------------------------------------------
+        // CHECK STUDENT
+        // ----------------------------------------------------
+
+        if (
+            !selectedStudent ||
+            !selectedStudent._id
+        ) {
+
+            showFormMessage(
+                "Please find a student first.",
+                "error"
+            );
+
+            return;
+        }
+
+
+        // ----------------------------------------------------
+        // GET VALUES
+        // ----------------------------------------------------
+
+        const cgpaValue =
+            facultyCgpa.value.trim();
+
+
+        const statusValue =
+            mentorStatus.value;
+
+
+        const remarksValue =
+            mentorRemarks.value.trim();
+
+
+        // ----------------------------------------------------
+        // VALIDATE CGPA
+        // ----------------------------------------------------
+
+        if (cgpaValue === "") {
+
+            facultyCgpa.classList.add(
+                "input-error"
+            );
+
+            showFormMessage(
+                "Please enter CGPA.",
+                "error"
+            );
+
+            facultyCgpa.focus();
+
+            return;
+        }
+
+
+        const cgpa =
+            Number(cgpaValue);
+
+
+        if (
+            Number.isNaN(cgpa) ||
+            cgpa < 0 ||
+            cgpa > 10
+        ) {
+
+            facultyCgpa.classList.add(
+                "input-error"
+            );
+
+            showFormMessage(
+                "CGPA must be between 0 and 10.",
+                "error"
+            );
+
+            facultyCgpa.focus();
+
+            return;
+        }
+
+
+        facultyCgpa.classList.remove(
+            "input-error"
+        );
+
+
+        // ----------------------------------------------------
+        // UPDATE DATABASE
+        // ----------------------------------------------------
+
+        showFormMessage(
+            "Updating student...",
+            "success"
+        );
+
+
+        try {
+
+            console.log(
+                "Updating student ID:",
+                selectedStudent._id
+            );
+
+
+            console.log(
+                "Update data:",
+                {
+                    cgpa: cgpa,
+                    mentorRemarks: remarksValue,
+                    mentorStatus: statusValue
+                }
+            );
+
+
+            const response =
+                await fetch(
+                    `${updateAPI}/students/${selectedStudent._id}`,
+                    {
+                        method: "PUT",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+
+                            cgpa: cgpa,
+
+                            mentorRemarks:
+                                remarksValue,
+
+                            mentorStatus:
+                                statusValue
+
+                        })
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            console.log(
+                "Update response:",
+                data
+            );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.message ||
+                    "Student update failed."
+                );
+            }
+
+
+            // ------------------------------------------------
+            // GET UPDATED STUDENT AGAIN
+            // ------------------------------------------------
+
+            const verifyResponse =
+                await fetch(
+                    `${updateAPI}/students/${selectedStudent._id}`
+                );
+
+
+            const verifyData =
+                await verifyResponse.json();
+
+
+            console.log(
+                "Updated student from database:",
+                verifyData
+            );
+
+
+            const updatedStudent =
+                verifyData.student ||
+                verifyData.data ||
+                verifyData;
+
+
+            if (
+                !updatedStudent ||
+                !updatedStudent._id
+            ) {
+
+                throw new Error(
+                    "Student was updated, but verification failed."
+                );
+            }
+
+
+            // Replace selected student
+
+            selectedStudent =
+                updatedStudent;
+
+
+            // Update displayed values
+
+            facultyCgpa.value =
+                Number(
+                    updatedStudent.cgpa || 0
+                );
+
+
+            mentorStatus.value =
+                updatedStudent.mentorStatus ||
+                "Pending";
+
+
+            mentorRemarks.value =
+                updatedStudent.mentorRemarks ||
+                "";
+
+
+            // ------------------------------------------------
+            // SUCCESS
+            // ------------------------------------------------
+
+            showFormMessage(
+                `Student ${updatedStudent.name} was updated successfully. CGPA: ${Number(
+                    updatedStudent.cgpa || 0
+                ).toFixed(2)}`,
+                "success"
+            );
+
+
+            alert(
+                "Student updated successfully."
+            );
+
+
+            console.log(
+                "FINAL UPDATED STUDENT:",
+                updatedStudent
+            );
+
+        }
+
+
+        catch (error) {
+
+            console.error(
+                "Update student error:",
+                error
+            );
+
+
+            showFormMessage(
+                error.message ||
+                "Unable to update student.",
+                "error"
+            );
+
+        }
+
+    }
+);
+
+
+// ============================================================
+// CLEAR
+// ============================================================
+
+function clearUpdatePage() {
+
+    selectedStudent = null;
+
+
+    registerNumberInput.value =
+        "";
+
+    studentNameInput.value =
+        "";
+
+
+    document.getElementById(
+        "displayRegisterNumber"
+    ).value = "";
+
+
+    document.getElementById(
+        "displayStudentName"
+    ).value = "";
+
+
+    document.getElementById(
+        "displayDepartment"
+    ).value = "";
+
+
+    document.getElementById(
+        "displaySection"
+    ).value = "";
+
+
+    document.getElementById(
+        "displayCareerGoal"
+    ).value = "";
+
+
+    document.getElementById(
+        "displayStudentType"
+    ).value = "";
+
+
+    facultyCgpa.value =
+        "";
+
+
+    mentorStatus.value =
+        "Pending";
+
+
+    mentorRemarks.value =
+        "";
+
+
+    studentDetailsCard.style.display =
+        "none";
+
+
+    updateCard.style.display =
+        "none";
+
+
+    searchMessage.innerHTML =
+        "";
+
+
+    formMessage.innerHTML =
+        "";
+
+}
+
+
+clearStudentBtn.addEventListener(
+    "click",
+    clearUpdatePage
+);
+
+
+document.getElementById(
+    "resetUpdateBtn"
+).addEventListener(
+    "click",
+    function () {
+
+        if (selectedStudent) {
+
+            facultyCgpa.value =
+                selectedStudent.cgpa || "";
+
+
+            mentorStatus.value =
+                selectedStudent.mentorStatus ||
+                "Pending";
+
+
+            mentorRemarks.value =
+                selectedStudent.mentorRemarks ||
+                "";
+
+            formMessage.innerHTML = "";
+
+        } else {
+
+            clearUpdatePage();
+
+        }
+
+    }
+);
+
+
+// ============================================================
+// ENTER KEY = FIND STUDENT
+// ============================================================
+
+registerNumberInput.addEventListener(
+    "keydown",
+    function (event) {
+
+        if (event.key === "Enter") {
+
+            event.preventDefault();
+
+            findStudentBtn.click();
+
+        }
+
+    }
+);
+
+
+// ============================================================
+// FACULTY ACCESS CHECK
+// ============================================================
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const loggedUser =
+            localStorage.getItem(
+                "loggedUser"
+            );
+
+
+        if (!loggedUser) {
+
+            window.location.href =
+                "index.html";
+
+            return;
+        }
+
+
+        try {
+
+            const user =
+                JSON.parse(
+                    loggedUser
+                );
+
+
+            if (
+                user.role !==
+                "Faculty"
+            ) {
+
+                alert(
+                    "Faculty access only."
+                );
+
+
+                window.location.href =
+                    "student-dashboard.html";
+
+            }
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "User session error:",
+                error
+            );
+
+
+            localStorage.removeItem(
+                "loggedUser"
+            );
+
+
+            window.location.href =
+                "index.html";
+
+        }
+
+    }
+);
+
+</script>
+
 
 </body>
 

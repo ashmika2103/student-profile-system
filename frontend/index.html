@@ -1,7 +1,6 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
-
+<script src="js/navigation.js"></script>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,27 +16,44 @@
 
         <div class="login-container">
 
-            <!-- Register button - TOP RIGHT -->
+            <!-- REGISTER LINK -->
             <div class="register-top">
+
                 <span>New Student?</span>
-                <a href="student-register.html" class="register-button">
+
+                <a
+                    href="student-register.html"
+                    class="register-button"
+                >
                     Register
                 </a>
+
             </div>
 
-            <!-- Login Header -->
+
+            <!-- HEADER -->
             <div class="login-header">
-                <h1>Student Profiling System</h1>
+
+                <h1>
+                    Student Profiling System
+                </h1>
+
                 <p>
                     Student Academic Personal and Career Profiling System
                 </p>
+
             </div>
 
-            <!-- Login Form -->
+
+            <!-- LOGIN FORM -->
             <form id="loginForm">
 
+                <!-- LOGIN ID -->
                 <div class="form-group">
-                    <label for="loginId">Login ID</label>
+
+                    <label for="loginId">
+                        Login ID
+                    </label>
 
                     <input
                         type="text"
@@ -47,10 +63,16 @@
                         autocomplete="username"
                         required
                     >
+
                 </div>
 
+
+                <!-- PASSWORD -->
                 <div class="form-group">
-                    <label for="password">Password</label>
+
+                    <label for="password">
+                        Password
+                    </label>
 
                     <input
                         type="password"
@@ -60,36 +82,85 @@
                         autocomplete="current-password"
                         required
                     >
+
+                    <!-- SHOW PASSWORD -->
+                    <label
+                        style="
+                            display:flex;
+                            align-items:center;
+                            gap:8px;
+                            margin-top:8px;
+                            font-size:14px;
+                            cursor:pointer;
+                        "
+                    >
+
+                        <input
+                            type="checkbox"
+                            id="showLoginPassword"
+                            style="
+                                width:auto;
+                                margin:0;
+                                cursor:pointer;
+                            "
+                        >
+
+                        <span>
+                            Show Password
+                        </span>
+
+                    </label>
+
                 </div>
 
+
+                <!-- ROLE -->
                 <div class="form-group">
-                    <label for="role">Role</label>
+
+                    <label for="role">
+                        Role
+                    </label>
 
                     <select
                         id="role"
                         name="role"
                         required
                     >
-                        <option value="">Select Role</option>
-                        <option value="Student">Student</option>
-                        <option value="Faculty">Faculty</option>
+
+                        <option value="">
+                            Select Role
+                        </option>
+
+                        <option value="Student">
+                            Student
+                        </option>
+
+                        <option value="Faculty">
+                            Faculty
+                        </option>
+
                     </select>
+
                 </div>
 
-                <!-- Login error -->
+
+                <!-- ERROR -->
                 <div
                     id="loginError"
                     class="error-message"
                 ></div>
 
-                <!-- Login button -->
+
+                <!-- LOGIN BUTTON -->
                 <div class="login-button-container">
+
                     <button
                         type="submit"
                         class="login-button"
                     >
                         Login
                     </button>
+
                 </div>
 
             </form>
@@ -98,10 +169,60 @@
 
     </div>
 
-    <!-- Your existing JavaScript -->
+
+    <!-- APP JS -->
     <script src="js/app.js"></script>
+
+
+    <!-- SHOW LOGIN PASSWORD -->
+    <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                const password =
+                    document.getElementById(
+                        "password"
+                    );
+
+                const checkbox =
+                    document.getElementById(
+                        "showLoginPassword"
+                    );
+
+
+                if (
+                    password &&
+                    checkbox
+                ) {
+
+                    checkbox.addEventListener(
+                        "change",
+                        function () {
+
+                            if (
+                                checkbox.checked
+                            ) {
+
+                                password.type =
+                                    "text";
+
+                            } else {
+
+                                password.type =
+                                    "password";
+                            }
+
+                        }
+                    );
+                }
+
+            }
+        );
+
+    </script>
 
 </body>
 
 </html>
-```

@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const path = require("path");
 
 dotenv.config();
 
@@ -28,7 +29,7 @@ app.use(
         extended: true
     })
 );
-
+app.use(express.static(path.join(__dirname, "../frontend")));
 
 /* =========================
    ROUTES
@@ -56,13 +57,9 @@ app.use(
 ========================= */
 
 app.get("/", (req, res) => {
-
-    res.json({
-        success: true,
-        message:
-            "Student Academic Personal and Career Profiling System API is running"
-    });
-
+    res.sendFile(
+        path.join(__dirname, "../frontend/index.html")
+    );
 });
 
 
@@ -144,7 +141,7 @@ mongoose
             "MongoDB connected successfully"
         );
 
-        app.listen(PORT, () => {
+        app.listen(PORT, "0.0.0.0",() => {
 
             console.log(
                 `Server running on http://localhost:${PORT}`
